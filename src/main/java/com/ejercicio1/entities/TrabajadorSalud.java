@@ -3,10 +3,7 @@ package com.ejercicio1.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-/**
- * Entidad que representa un Trabajador de la Salud
- * Atributos de diferentes tipos según el requisito del ejercicio
- */
+
 public class TrabajadorSalud implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -36,7 +33,7 @@ public class TrabajadorSalud implements Serializable {
     public TrabajadorSalud() {
     }
     
-    // Constructor con parámetros
+    // Constructor completo
     public TrabajadorSalud(String cedula, String nombre, String apellido, 
                           String especialidad, Integer matriculaProfesional, 
                           LocalDate fechaIngreso, boolean activo) {
