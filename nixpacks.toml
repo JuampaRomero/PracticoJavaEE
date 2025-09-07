@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["jdk17", "maven"]
+
+[phases.build]
+cmds = ["mvn clean package -DskipTests"]
+
+[start]
+cmd = "java -jar jetty-runner-11.0.18.jar --port $PORT target/*.war"
+
+[phases.install]
+cmds = ["wget https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-runner/11.0.18/jetty-runner-11.0.18.jar"]
