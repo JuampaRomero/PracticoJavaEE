@@ -38,11 +38,11 @@ public class ApiTrabajadoresServlet extends HttpServlet {
             for (int i = 0; i < trabajadores.size(); i++) {
                 TrabajadorSalud t = trabajadores.get(i);
                 out.println("    {");
-                out.println("      \"id\": " + t.getId() + ",");
+                out.println("      \"cedula\": \"" + escapeJson(t.getCedula()) + "\",");
                 out.println("      \"nombre\": \"" + escapeJson(t.getNombre()) + "\",");
-                out.println("      \"ci\": \"" + escapeJson(t.getCi()) + "\",");
+                out.println("      \"apellido\": \"" + escapeJson(t.getApellido()) + "\",");
                 out.println("      \"especialidad\": \"" + escapeJson(t.getEspecialidad()) + "\",");
-                out.println("      \"email\": \"" + escapeJson(t.getEmail()) + "\",");
+                out.println("      \"matriculaProfesional\": " + t.getMatriculaProfesional() + ",");
                 out.println("      \"activo\": " + t.isActivo());
                 out.print("    }");
                 if (i < trabajadores.size() - 1) {
