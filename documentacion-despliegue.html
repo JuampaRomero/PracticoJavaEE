@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación de Despliegue - GestorIdentidades</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            color: #495057;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+
+        .file-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .file-card h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .file-purpose {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .file-purpose strong {
+            color: #1976d2;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        .highlight-yaml { color: #a6e22e; }
+        .highlight-comment { color: #75715e; font-style: italic; }
+        .highlight-key { color: #66d9ef; }
+        .highlight-string { color: #e6db74; }
+        .highlight-number { color: #ae81ff; }
+
+        .info-box {
+            background: #e8f4fd;
+            border-left: 5px solid #0066cc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            line-height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .command-box {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-button:hover {
+            background: #764ba2;
+        }
+
+        .architecture-diagram {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 150px;
+            text-align: center;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        footer {
+            background: #343a40;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 0 5px;
+        }
+
+        .badge.docker { background: #0db7ed; }
+        .badge.aws { background: #ff9900; }
+        .badge.java { background: #007396; }
+        .badge.wildfly { background: #a4022f; }
+
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
+            
+            .flow-diagram {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Documentación de Despliegue</h1>
+            <p>Sistema de Gestión de Identidades - Trabajadores del Sector Salud</p>
+            <p style="margin-top: 10px;">
+                <span class="badge docker">Docker</span>
+                <span class="badge aws">AWS EC2</span>
+                <span class="badge java">Jakarta EE</span>
+                <span class="badge wildfly">WildFly 33</span>
+            </p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#overview">Vista General</a></li>
+                <li><a href="#architecture">Arquitectura</a></li>
+                <li><a href="#docker-files">Archivos Docker</a></li>
+                <li><a href="#aws-files">Scripts AWS</a></li>
+                <li><a href="#deployment-process">Proceso de Despliegue</a></li>
+                <li><a href="#troubleshooting">Solución de Problemas</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- Vista General -->
+            <section id="overview">
+                <h2>📋 Vista General del Proyecto</h2>
+                
+                <div class="info-box">
+                    <h3>🎯 Objetivo del Despliegue</h3>
+                    <p>Desplegar una aplicación Jakarta EE 11 en un servidor WildFly 33 containerizado con Docker, 
+                    ejecutándose en una instancia EC2 de AWS, con base de datos PostgreSQL y herramientas de administración.</p>
+                </div>
+
+                <h3>Tecnologías Utilizadas</h3>
+                <table>
+                    <tr>
+                        <th>Tecnología</th>
+                        <th>Versión</th>
+                        <th>Propósito</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Jakarta EE</strong></td>
+                        <td>11</td>
+                        <td>Framework principal de la aplicación</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WildFly</strong></td>
+                        <td>33.0.2.Final</td>
+                        <td>Servidor de aplicaciones</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Docker</strong></td>
+                        <td>28.4.0</td>
+                        <td>Containerización</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PostgreSQL</strong></td>
+                        <td>16-alpine</td>
+                        <td>Base de datos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AWS EC2</strong></td>
+                        <td>t2.micro</td>
+                        <td>Servidor en la nube</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ubuntu</strong></td>
+                        <td>24.04 LTS</td>
+                        <td>Sistema operativo del servidor</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Arquitectura -->
+            <section id="architecture">
+                <h2>🏗️ Arquitectura del Sistema</h2>
+                
+                <div class="architecture-diagram">
+                    <h3>Flujo de Despliegue</h3>
+                    <div class="flow-diagram">
+                        <div class="flow-step">
+                            <strong>1. Desarrollo Local</strong>
+                            <p>Código Java + Maven</p>
+                        </div>
+                        <span class="arrow">→</span>
+                        <div class="flow-step">
+                            <strong>2. Dockerización</strong>
+                            <p>Imagen + Compose</p>
+                        </div>
+                        <span class="arrow">→</span>
+                        <div class="flow-step">
+                            <strong>3. AWS EC2</strong>
+                            <p>Ubuntu Server</p>
+                        </div>
+                        <span class="arrow">→</span>
+                        <div class="flow-step">
+                            <strong>4. Producción</strong>
+                            <p>App Disponible</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Componentes del Sistema</h3>
+                <div class="info-box">
+                    <ul>
+                        <li><strong>Contenedor WildFly:</strong> Ejecuta la aplicación Jakarta EE</li>
+                        <li><strong>Contenedor PostgreSQL:</strong> Almacena los datos de trabajadores</li>
+                        <li><strong>Contenedor PgAdmin:</strong> Interfaz web para administrar la base de datos</li>
+                        <li><strong>Red Docker:</strong> Permite comunicación entre contenedores</li>
+                        <li><strong>Volúmenes:</strong> Persisten datos y logs</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Archivos Docker -->
+            <section id="docker-files">
+                <h2>🐳 Archivos Docker Creados</h2>
+
+                <!-- Dockerfile -->
+                <div class="file-card">
+                    <h3>📄 Dockerfile</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Define cómo construir la imagen Docker de la aplicación.
+                        Utiliza un proceso de construcción multi-etapa para optimizar el tamaño final.
+                    </div>
+
+                    <h4>Contenido y Explicación:</h4>
+                    <pre><code><span class="highlight-comment"># Etapa 1: Construcción con Maven</span>
+<span class="highlight-key">FROM</span> maven:3.9-eclipse-temurin-21 <span class="highlight-key">AS</span> build
+<span class="highlight-key">WORKDIR</span> /app
+
+<span class="highlight-comment"># Copiar configuración de Maven (se cachea si no cambia)</span>
+<span class="highlight-key">COPY</span> pom.xml .
+<span class="highlight-key">COPY</span> mvnw .
+<span class="highlight-key">COPY</span> mvnw.cmd .
+<span class="highlight-key">COPY</span> .mvn .mvn
+
+<span class="highlight-comment"># Descargar dependencias (optimización de caché)</span>
+<span class="highlight-key">RUN</span> mvn dependency:go-offline -B
+
+<span class="highlight-comment"># Copiar código fuente y compilar</span>
+<span class="highlight-key">COPY</span> src ./src
+<span class="highlight-key">RUN</span> mvn clean package -DskipTests
+
+<span class="highlight-comment"># Etapa 2: Imagen final con WildFly</span>
+<span class="highlight-key">FROM</span> quay.io/wildfly/wildfly:33.0.2.Final-jdk21
+
+<span class="highlight-comment"># Variables de entorno para configuración</span>
+<span class="highlight-key">ENV</span> WILDFLY_USER admin
+<span class="highlight-key">ENV</span> WILDFLY_PASS Admin123!
+<span class="highlight-key">ENV</span> JBOSS_HOME /opt/jboss/wildfly
+
+<span class="highlight-comment"># Crear usuario administrador</span>
+<span class="highlight-key">RUN</span> ${JBOSS_HOME}/bin/add-user.sh ${WILDFLY_USER} ${WILDFLY_PASS} --silent
+
+<span class="highlight-comment"># Copiar WAR desde etapa de construcción</span>
+<span class="highlight-key">COPY</span> --from=build /app/target/*.war ${JBOSS_HOME}/standalone/deployments/
+
+<span class="highlight-comment"># Exponer puertos</span>
+<span class="highlight-key">EXPOSE</span> 8080 9990 8787
+
+<span class="highlight-comment"># Healthcheck para monitorear salud del contenedor</span>
+<span class="highlight-key">HEALTHCHECK</span> --interval=30s --timeout=3s \
+    CMD curl -f http://localhost:8080/ || exit 1
+
+<span class="highlight-comment"># Comando de inicio</span>
+<span class="highlight-key">CMD</span> ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]</code></pre>
+
+                    <h4>Proceso que Realiza:</h4>
+                    <ol>
+                        <li><span class="step-number">1</span> <strong>Etapa Build:</strong> Usa Maven para compilar el código Java</li>
+                        <li><span class="step-number">2</span> <strong>Cacheo de Dependencias:</strong> Optimiza tiempos descargando dependencias solo si cambia pom.xml</li>
+                        <li><span class="step-number">3</span> <strong>Compilación:</strong> Genera el archivo WAR de la aplicación</li>
+                        <li><span class="step-number">4</span> <strong>Etapa Runtime:</strong> Usa imagen base de WildFly</li>
+                        <li><span class="step-number">5</span> <strong>Configuración:</strong> Crea usuario admin y configura el servidor</li>
+                        <li><span class="step-number">6</span> <strong>Despliegue:</strong> Copia el WAR al directorio de deployments</li>
+                        <li><span class="step-number">7</span> <strong>Healthcheck:</strong> Verifica que la aplicación responda</li>
+                    </ol>
+                </div>
+
+                <!-- docker-compose.yml -->
+                <div class="file-card">
+                    <h3>📄 docker-compose.yml</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Orquesta múltiples contenedores Docker para crear un ambiente completo
+                        con aplicación, base de datos y herramientas de administración.
+                    </div>
+
+                    <h4>Contenido y Explicación:</h4>
+                    <pre><code><span class="highlight-key">version:</span> <span class="highlight-string">'3.8'</span>
+
+<span class="highlight-key">services:</span>
+  <span class="highlight-comment"># Servicio de Base de Datos PostgreSQL</span>
+  <span class="highlight-key">postgres:</span>
+    <span class="highlight-key">image:</span> postgres:16-alpine
+    <span class="highlight-key">container_name:</span> gestor-db
+    <span class="highlight-key">environment:</span>
+      <span class="highlight-key">POSTGRES_DB:</span> gestoridentidades
+      <span class="highlight-key">POSTGRES_USER:</span> gestor_user
+      <span class="highlight-key">POSTGRES_PASSWORD:</span> gestor_pass_2024
+    <span class="highlight-key">ports:</span>
+      - <span class="highlight-string">"5432:5432"</span>
+    <span class="highlight-key">volumes:</span>
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d
+    <span class="highlight-key">networks:</span>
+      - gestor-network
+    <span class="highlight-key">healthcheck:</span>
+      <span class="highlight-key">test:</span> ["CMD-SHELL", "pg_isready -U gestor_user"]
+      <span class="highlight-key">interval:</span> 10s
+
+  <span class="highlight-comment"># Servicio de Aplicación WildFly</span>
+  <span class="highlight-key">wildfly:</span>
+    <span class="highlight-key">build:</span>
+      <span class="highlight-key">context:</span> .
+      <span class="highlight-key">dockerfile:</span> Dockerfile
+    <span class="highlight-key">container_name:</span> gestor-app
+    <span class="highlight-key">depends_on:</span>
+      <span class="highlight-key">postgres:</span>
+        <span class="highlight-key">condition:</span> service_healthy
+    <span class="highlight-key">environment:</span>
+      <span class="highlight-key">DB_HOST:</span> postgres
+      <span class="highlight-key">DB_PORT:</span> 5432
+      <span class="highlight-key">DB_NAME:</span> gestoridentidades
+    <span class="highlight-key">ports:</span>
+      - <span class="highlight-string">"8080:8080"</span>  <span class="highlight-comment"># HTTP</span>
+      - <span class="highlight-string">"9990:9990"</span>  <span class="highlight-comment"># Admin Console</span>
+    <span class="highlight-key">volumes:</span>
+      - wildfly_data:/opt/jboss/wildfly/standalone/data
+      - wildfly_logs:/opt/jboss/wildfly/standalone/log
+    <span class="highlight-key">networks:</span>
+      - gestor-network
+
+  <span class="highlight-comment"># Servicio de Administración de BD</span>
+  <span class="highlight-key">pgadmin:</span>
+    <span class="highlight-key">image:</span> dpage/pgadmin4:latest
+    <span class="highlight-key">container_name:</span> gestor-pgadmin
+    <span class="highlight-key">environment:</span>
+      <span class="highlight-key">PGADMIN_DEFAULT_EMAIL:</span> admin@gestor.com
+      <span class="highlight-key">PGADMIN_DEFAULT_PASSWORD:</span> admin123
+    <span class="highlight-key">ports:</span>
+      - <span class="highlight-string">"5050:80"</span>
+    <span class="highlight-key">networks:</span>
+      - gestor-network
+
+<span class="highlight-key">networks:</span>
+  <span class="highlight-key">gestor-network:</span>
+    <span class="highlight-key">driver:</span> bridge
+
+<span class="highlight-key">volumes:</span>
+  <span class="highlight-key">postgres_data:</span>
+  <span class="highlight-key">wildfly_data:</span>
+  <span class="highlight-key">wildfly_logs:</span></code></pre>
+
+                    <h4>Componentes y su Función:</h4>
+                    <table>
+                        <tr>
+                            <th>Servicio</th>
+                            <th>Puerto</th>
+                            <th>Función</th>
+                        </tr>
+                        <tr>
+                            <td><strong>postgres</strong></td>
+                            <td>5432</td>
+                            <td>Base de datos principal con PostgreSQL 16</td>
+                        </tr>
+                        <tr>
+                            <td><strong>wildfly</strong></td>
+                            <td>8080, 9990</td>
+                            <td>Servidor de aplicaciones Jakarta EE</td>
+                        </tr>
+                        <tr>
+                            <td><strong>pgadmin</strong></td>
+                            <td>5050</td>
+                            <td>Interfaz web para administrar PostgreSQL</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- .dockerignore -->
+                <div class="file-card">
+                    <h3>📄 .dockerignore</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Excluye archivos innecesarios del contexto de Docker,
+                        reduciendo el tamaño de la imagen y mejorando tiempos de construcción.
+                    </div>
+
+                    <h4>Archivos Excluidos:</h4>
+                    <ul>
+                        <li><code>target/</code> - Archivos compilados (excepto el WAR)</li>
+                        <li><code>.git/</code> - Historial de Git</li>
+                        <li><code>*.md</code> - Documentación</li>
+                        <li><code>*.log</code> - Archivos de log</li>
+                        <li><code>node_modules/</code> - Dependencias de Node.js (si las hubiera)</li>
+                        <li><code>*.pem</code> - Claves SSH</li>
+                        <li><code>src/test/</code> - Código de pruebas</li>
+                    </ul>
+                </div>
+
+                <!-- Script SQL -->
+                <div class="file-card">
+                    <h3>📄 docker/init-db/01-init-database.sql</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Script SQL que inicializa la base de datos con esquema,
+                        tablas, índices, vistas y datos de ejemplo.
+                    </div>
+
+                    <h4>Estructura Creada:</h4>
+                    <pre><code><span class="highlight-comment">-- Crear esquema</span>
+CREATE SCHEMA IF NOT EXISTS gestor;
+
+<span class="highlight-comment">-- Tabla principal de trabajadores</span>
+CREATE TABLE gestor.trabajadores (
+    id BIGSERIAL PRIMARY KEY,
+    cedula VARCHAR(15) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    especialidad VARCHAR(100) NOT NULL,
+    matricula_profesional INTEGER NOT NULL,
+    fecha_ingreso DATE NOT NULL,
+    estado BOOLEAN DEFAULT true,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+<span class="highlight-comment">-- Índices para optimizar búsquedas</span>
+CREATE INDEX idx_trabajadores_cedula ON gestor.trabajadores(cedula);
+CREATE INDEX idx_trabajadores_especialidad ON gestor.trabajadores(especialidad);
+
+<span class="highlight-comment">-- Trigger para actualizar fecha_actualizacion</span>
+CREATE TRIGGER update_trabajadores_fecha
+    BEFORE UPDATE ON gestor.trabajadores
+    FOR EACH ROW
+    EXECUTE FUNCTION gestor.update_fecha_actualizacion();
+
+<span class="highlight-comment">-- Vista de estadísticas</span>
+CREATE VIEW gestor.v_estadisticas_trabajadores AS
+SELECT 
+    COUNT(*) as total_trabajadores,
+    COUNT(CASE WHEN estado = true THEN 1 END) as trabajadores_activos,
+    COUNT(DISTINCT especialidad) as total_especialidades
+FROM gestor.trabajadores;</code></pre>
+
+                    <h4>Datos de Ejemplo Insertados:</h4>
+                    <p>El script inserta 10 trabajadores de ejemplo con diferentes especialidades médicas
+                    para facilitar las pruebas iniciales del sistema.</p>
+                </div>
+            </section>
+
+            <!-- Scripts AWS -->
+            <section id="aws-files">
+                <h2>☁️ Scripts para AWS</h2>
+
+                <!-- docker-build.ps1 -->
+                <div class="file-card">
+                    <h3>📄 docker-build.ps1</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Script PowerShell para Windows que automatiza la construcción
+                        de la imagen Docker localmente.
+                    </div>
+
+                    <h4>Funciones Principales:</h4>
+                    <ol>
+                        <li><span class="step-number">1</span> Verifica que Docker esté instalado y corriendo</li>
+                        <li><span class="step-number">2</span> Compila la aplicación con Maven</li>
+                        <li><span class="step-number">3</span> Construye la imagen Docker</li>
+                        <li><span class="step-number">4</span> Verifica que la imagen se creó correctamente</li>
+                        <li><span class="step-number">5</span> Muestra instrucciones para ejecutar</li>
+                    </ol>
+
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Ejecutar el script
+.\docker-build.ps1</code>
+                    </div>
+                </div>
+
+                <!-- aws-deploy.sh -->
+                <div class="file-card">
+                    <h3>📄 aws-deploy.sh</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Script Bash que automatiza la creación de recursos en AWS
+                        y el despliegue de la aplicación.
+                    </div>
+
+                    <h4>Proceso Automatizado:</h4>
+                    <pre><code><span class="highlight-comment">#!/bin/bash</span>
+
+<span class="highlight-comment"># Variables de configuración</span>
+AWS_REGION="us-east-2"
+EC2_INSTANCE_TYPE="t2.micro"
+KEY_PAIR_NAME="gestor-key"
+SECURITY_GROUP_NAME="gestor-sg"
+
+<span class="highlight-comment"># Funciones del script:</span>
+
+<span class="highlight-key">check_aws_cli()</span> {
+    <span class="highlight-comment"># Verifica que AWS CLI esté instalado</span>
+}
+
+<span class="highlight-key">create_security_group()</span> {
+    <span class="highlight-comment"># Crea Security Group con reglas necesarias</span>
+    <span class="highlight-comment"># Puertos: 22 (SSH), 8080 (App), 9990 (Admin), 5432 (DB)</span>
+}
+
+<span class="highlight-key">create_key_pair()</span> {
+    <span class="highlight-comment"># Genera par de claves SSH para acceso</span>
+}
+
+<span class="highlight-key">launch_ec2_instance()</span> {
+    <span class="highlight-comment"># Lanza instancia EC2 con Ubuntu 24.04</span>
+    <span class="highlight-comment"># Instala Docker automáticamente</span>
+}</code></pre>
+
+                    <h4>Recursos AWS Creados:</h4>
+                    <ul>
+                        <li>✅ Security Group con reglas de firewall</li>
+                        <li>✅ Key Pair para acceso SSH</li>
+                        <li>✅ Instancia EC2 t2.micro</li>
+                        <li>✅ User Data script para configuración inicial</li>
+                    </ul>
+                </div>
+
+                <!-- install-docker-ubuntu.sh -->
+                <div class="file-card">
+                    <h3>📄 install-docker-ubuntu.sh</h3>
+                    <div class="file-purpose">
+                        <strong>Propósito:</strong> Script simplificado para instalar Docker y Docker Compose
+                        en Ubuntu 24.04.
+                    </div>
+
+                    <h4>Pasos de Instalación:</h4>
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># 1. Actualizar sistema
+sudo apt-get update -y && sudo apt-get upgrade -y
+
+# 2. Instalar dependencias
+sudo apt-get install -y ca-certificates curl gnupg lsb-release git
+
+# 3. Agregar repositorio Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# 4. Instalar Docker
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# 5. Instalar Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 6. Configurar permisos
+sudo usermod -aG docker $USER
+sudo systemctl enable docker</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Proceso de Despliegue -->
+            <section id="deployment-process">
+                <h2>🚀 Proceso de Despliegue Completo</h2>
+
+                <div class="success-box">
+                    <h3>✅ Despliegue Exitoso en AWS EC2</h3>
+                    <p><strong>Servidor:</strong> 3.21.53.113 (Ubuntu 24.04 LTS)</p>
+                    <p><strong>Instancia:</strong> t2.micro (1 vCPU, 1GB RAM, 8GB Storage)</p>
+                    <p><strong>Región:</strong> us-east-2 (Ohio)</p>
+                </div>
+
+                <h3>Paso a Paso del Despliegue</h3>
+
+                <!-- Paso 1 -->
+                <div class="file-card">
+                    <h3><span class="step-number">1</span> Preparación Local</h3>
+                    <h4>Acciones Realizadas:</h4>
+                    <ul>
+                        <li>✅ Compilación del proyecto con Maven</li>
+                        <li>✅ Creación de archivos Docker</li>
+                        <li>✅ Pruebas locales de la aplicación</li>
+                        <li>✅ Generación del archivo WAR (16.6 MB)</li>
+                    </ul>
+
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Compilar proyecto
+mvnw.cmd clean package -DskipTests
+
+# Crear ZIP con archivos necesarios
+Compress-Archive -Path @("Dockerfile", "docker-compose.yml", "pom.xml", "src", "docker") -DestinationPath gestor-deploy.zip</code>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="file-card">
+                    <h3><span class="step-number">2</span> Configuración AWS</h3>
+                    <h4>Configuración de Seguridad:</h4>
+                    <table>
+                        <tr>
+                            <th>Puerto</th>
+                            <th>Protocolo</th>
+                            <th>Origen</th>
+                            <th>Servicio</th>
+                        </tr>
+                        <tr>
+                            <td>22</td>
+                            <td>TCP</td>
+                            <td>0.0.0.0/0</td>
+                            <td>SSH</td>
+                        </tr>
+                        <tr>
+                            <td>80</td>
+                            <td>TCP</td>
+                            <td>0.0.0.0/0</td>
+                            <td>HTTP</td>
+                        </tr>
+                        <tr>
+                            <td>8080</td>
+                            <td>TCP</td>
+                            <td>0.0.0.0/0</td>
+                            <td>WildFly App</td>
+                        </tr>
+                        <tr>
+                            <td>9990</td>
+                            <td>TCP</td>
+                            <td>0.0.0.0/0</td>
+                            <td>WildFly Admin</td>
+                        </tr>
+                        <tr>
+                            <td>5432</td>
+                            <td>TCP</td>
+                            <td>0.0.0.0/0</td>
+                            <td>PostgreSQL</td>
+                        </tr>
+                    </table>
+
+                    <h4>Configuración de AWS CLI:</h4>
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Instalar AWS CLI
+msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
+
+# Configurar credenciales
+aws configure
+  AWS Access Key ID: [Tu Access Key]
+  AWS Secret Access Key: [Tu Secret Key]
+  Default region: us-east-2
+  Default output format: json</code>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="file-card">
+                    <h3><span class="step-number">3</span> Conexión y Configuración del Servidor</h3>
+                    <h4>Conexión SSH:</h4>
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Conectar al servidor
+ssh -i "C:\Users\Usuario\Downloads\KeyPairForSSH.pem" ubuntu@3.21.53.113</code>
+                    </div>
+
+                    <h4>Instalación de Docker en el Servidor:</h4>
+                    <p>Se ejecutó el script de instalación que realizó:</p>
+                    <ul>
+                        <li>Actualización del sistema Ubuntu</li>
+                        <li>Instalación de Docker CE 28.4.0</li>
+                        <li>Instalación de Docker Compose 2.24.0</li>
+                        <li>Configuración de permisos para el usuario ubuntu</li>
+                    </ul>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="file-card">
+                    <h3><span class="step-number">4</span> Transferencia de Archivos</h3>
+                    <h4>Archivos Transferidos:</h4>
+                    <ul>
+                        <li>✅ <code>gestor-deploy.zip</code> (97 KB) - Código fuente y configuración</li>
+                        <li>✅ <code>GestorIdentidades-1.0-SNAPSHOT.war</code> (16.6 MB) - Aplicación compilada</li>
+                    </ul>
+
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Subir archivos al servidor
+scp -i "KeyPairForSSH.pem" gestor-deploy.zip ubuntu@3.21.53.113:~/
+scp -i "KeyPairForSSH.pem" target\GestorIdentidades-1.0-SNAPSHOT.war ubuntu@3.21.53.113:~/</code>
+                    </div>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="file-card">
+                    <h3><span class="step-number">5</span> Despliegue con Docker</h3>
+                    
+                    <div class="warning-box">
+                        <h4>⚠️ Problema Encontrado: Espacio en Disco</h4>
+                        <p>La instancia t2.micro tiene solo 8GB de almacenamiento. La construcción multi-stage
+                        requería demasiado espacio, causando el error:</p>
+                        <code>no space left on device</code>
+                        
+                        <h4>Solución Aplicada:</h4>
+                        <p>Se optó por ejecutar WildFly directamente desde la imagen oficial y copiar el WAR:</p>
+                    </div>
+
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Limpiar espacio
+sudo docker system prune -a -f
+
+# Ejecutar WildFly
+sudo docker run -d --name wildfly-app \
+  -p 8080:8080 -p 9990:9990 \
+  -e WILDFLY_USER=admin \
+  -e WILDFLY_PASS=Admin123! \
+  quay.io/wildfly/wildfly:33.0.2.Final-jdk21
+
+# Copiar WAR al contenedor
+sudo docker cp ~/GestorIdentidades-1.0-SNAPSHOT.war \
+  wildfly-app:/opt/jboss/wildfly/standalone/deployments/</code>
+                    </div>
+                </div>
+
+                <!-- Paso 6 -->
+                <div class="file-card">
+                    <h3><span class="step-number">6</span> Verificación del Despliegue</h3>
+                    <h4>URLs Disponibles:</h4>
+                    <ul>
+                        <li>🌐 <strong>Aplicación:</strong> <a href="http://3.21.53.113:8080/GestorIdentidades-1.0-SNAPSHOT/" target="_blank">http://3.21.53.113:8080/GestorIdentidades-1.0-SNAPSHOT/</a></li>
+                        <li>🔧 <strong>Admin Console:</strong> <a href="http://3.21.53.113:9990" target="_blank">http://3.21.53.113:9990</a></li>
+                    </ul>
+
+                    <h4>Comandos de Verificación:</h4>
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Ver contenedores corriendo
+sudo docker ps
+
+# Ver logs de WildFly
+sudo docker logs -f wildfly-app
+
+# Verificar despliegue
+sudo docker exec wildfly-app ls /opt/jboss/wildfly/standalone/deployments/</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Solución de Problemas -->
+            <section id="troubleshooting">
+                <h2>🔧 Solución de Problemas</h2>
+
+                <div class="error-box">
+                    <h3>Problema 1: Espacio en Disco Insuficiente</h3>
+                    <p><strong>Error:</strong> <code>no space left on device</code></p>
+                    <p><strong>Causa:</strong> La instancia t2.micro tiene solo 8GB de almacenamiento</p>
+                    <p><strong>Solución:</strong></p>
+                    <ul>
+                        <li>Limpiar imágenes no utilizadas: <code>docker system prune -a -f</code></li>
+                        <li>Usar imagen pre-construida en lugar de construcción multi-stage</li>
+                        <li>Considerar usar una instancia con más almacenamiento (t2.small o t3.medium)</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3>Problema 2: Puertos No Accesibles</h3>
+                    <p><strong>Síntoma:</strong> No se puede acceder a la aplicación desde el navegador</p>
+                    <p><strong>Causa:</strong> Security Group no tiene los puertos abiertos</p>
+                    <p><strong>Solución:</strong></p>
+                    <ol>
+                        <li>Ir a AWS Console → EC2 → Security Groups</li>
+                        <li>Editar Inbound Rules</li>
+                        <li>Agregar reglas para puertos 8080, 9990, 5432</li>
+                        <li>Guardar cambios</li>
+                    </ol>
+                </div>
+
+                <div class="info-box">
+                    <h3>Problema 3: Permisos de Docker</h3>
+                    <p><strong>Error:</strong> <code>permission denied while trying to connect to the Docker daemon</code></p>
+                    <p><strong>Solución:</strong></p>
+                    <div class="command-box">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                        <code># Agregar usuario al grupo docker
+sudo usermod -aG docker $USER
+
+# Salir y volver a entrar
+exit
+ssh -i "key.pem" ubuntu@servidor</code>
+                    </div>
+                </div>
+
+                <h3>Comandos Útiles de Administración</h3>
+                <div class="command-box">
+                    <button class="copy-button" onclick="copyToClipboard(this)">Copiar</button>
+                    <code># Reiniciar contenedor
+sudo docker restart wildfly-app
+
+# Ver uso de recursos
+sudo docker stats
+
+# Entrar al contenedor
+sudo docker exec -it wildfly-app bash
+
+# Ver logs en tiempo real
+sudo docker logs -f wildfly-app
+
+# Backup de la aplicación
+sudo docker cp wildfly-app:/opt/jboss/wildfly/standalone/deployments/GestorIdentidades-1.0-SNAPSHOT.war ./backup.war
+
+# Limpiar todo y empezar de nuevo
+sudo docker stop $(sudo docker ps -aq)
+sudo docker rm $(sudo docker ps -aq)
+sudo docker system prune -a -f</code>
+                </div>
+            </section>
+
+            <!-- Mejoras y Recomendaciones -->
+            <section id="improvements">
+                <h2>💡 Mejoras y Recomendaciones</h2>
+
+                <div class="info-box">
+                    <h3>Para Producción</h3>
+                    <ul>
+                        <li>🔒 <strong>Seguridad:</strong> Cambiar todas las contraseñas por defecto</li>
+                        <li>🔐 <strong>HTTPS:</strong> Configurar certificados SSL con Let's Encrypt</li>
+                        <li>📊 <strong>Monitoreo:</strong> Implementar Prometheus + Grafana</li>
+                        <li>💾 <strong>Backups:</strong> Configurar backups automáticos de la base de datos</li>
+                        <li>⚖️ <strong>Load Balancer:</strong> Usar AWS ALB para alta disponibilidad</li>
+                        <li>🔄 <strong>CI/CD:</strong> Implementar pipeline con GitHub Actions</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h3>Optimizaciones Recomendadas</h3>
+                    <ul>
+                        <li>📦 <strong>Usar ECR:</strong> Amazon Elastic Container Registry para imágenes</li>
+                        <li>🚀 <strong>ECS o EKS:</strong> Para orquestación de contenedores</li>
+                        <li>💽 <strong>RDS:</strong> Amazon RDS para PostgreSQL gestionado</li>
+                        <li>📈 <strong>Auto Scaling:</strong> Configurar escalado automático</li>
+                        <li>🌍 <strong>CDN:</strong> CloudFront para contenido estático</li>
+                    </ul>
+                </div>
+
+                <h3>Estimación de Costos AWS</h3>
+                <table>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Configuración</th>
+                        <th>Costo Mensual (USD)</th>
+                    </tr>
+                    <tr>
+                        <td>EC2 t2.micro</td>
+                        <td>1 vCPU, 1GB RAM</td>
+                        <td>~$8.50</td>
+                    </tr>
+                    <tr>
+                        <td>EBS Storage</td>
+                        <td>8GB gp3</td>
+                        <td>~$0.80</td>
+                    </tr>
+                    <tr>
+                        <td>Data Transfer</td>
+                        <td>100GB salida</td>
+                        <td>~$9.00</td>
+                    </tr>
+                    <tr>
+                        <td>Elastic IP</td>
+                        <td>1 IP estática</td>
+                        <td>~$3.60</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Total Estimado</th>
+                        <th>~$21.90/mes</th>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Conclusión -->
+            <section id="conclusion">
+                <h2>🎯 Conclusión</h2>
+                
+                <div class="success-box">
+                    <h3>Logros del Proyecto</h3>
+                    <ul>
+                        <li>✅ Aplicación Jakarta EE 11 funcionando en la nube</li>
+                        <li>✅ Arquitectura containerizada con Docker</li>
+                        <li>✅ Despliegue automatizado en AWS EC2</li>
+                        <li>✅ Base de datos PostgreSQL integrada</li>
+                        <li>✅ Scripts de automatización funcionales</li>
+                        <li>✅ Documentación completa del proceso</li>
+                    </ul>
+                </div>
+
+                <h3>Lecciones Aprendidas</h3>
+                <ol>
+                    <li><strong>Optimización de Recursos:</strong> Las instancias pequeñas requieren estrategias especiales</li>
+                    <li><strong>Docker Multi-stage:</strong> Excelente para optimizar, pero requiere espacio durante construcción</li>
+                    <li><strong>Security Groups:</strong> Configuración crítica para acceso a servicios</li>
+                    <li><strong>Automatización:</strong> Scripts ahorran tiempo y reducen errores</li>
+                    <li><strong>Monitoreo:</strong> Healthchecks son esenciales para detectar problemas</li>
+                </ol>
+
+                <div class="architecture-diagram">
+                    <h3>Stack Tecnológico Final</h3>
+                    <p style="font-size: 1.2em; margin: 20px 0;">
+                        <span class="badge java">Jakarta EE 11</span>
+                        <span class="badge wildfly">WildFly 33</span>
+                        <span class="badge docker">Docker 28.4</span>
+                        <span class="badge">PostgreSQL 16</span>
+                        <span class="badge aws">AWS EC2</span>
+                        <span class="badge">Ubuntu 24.04</span>
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p><strong>Sistema de Gestión de Identidades</strong></p>
+            <p>Trabajadores del Sector Salud</p>
+            <p>Documentación generada: Septiembre 2025</p>
+            <p style="margin-top: 20px; opacity: 0.8;">
+                Desarrollado con Jakarta EE | Desplegado en AWS EC2 | Containerizado con Docker
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Función para copiar código al portapapeles
+        function copyToClipboard(button) {
+            const codeBlock = button.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '¡Copiado!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#667eea';
+                }, 2000);
+            });
+        }
+
+        // Smooth scrolling para navegación
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Resaltar sección activa en navegación
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const sections = document.querySelectorAll('section');
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('nav a').forEach(link => {
+                link.style.background = '';
+                link.style.color = '';
+                if (link.getAttribute('href') === '#' + current) {
+                    link.style.background = '#667eea';
+                    link.style.color = 'white';
+                }
+            });
+        });
+
+        // Animación de entrada para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.file-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s, transform 0.5s';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

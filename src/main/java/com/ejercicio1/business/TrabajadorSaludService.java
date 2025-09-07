@@ -134,7 +134,12 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             return List.of();
         }
         
-        return trabajadorDAO.obtenerTodos().stream()
+        List<TrabajadorSalud> todos = trabajadorDAO.obtenerTodos();
+        if (todos == null) {
+            return List.of();
+        }
+        
+        return todos.stream()
                 .filter(t -> t.getEspecialidad().equalsIgnoreCase(especialidad.trim()))
                 .collect(Collectors.toList());
     }
