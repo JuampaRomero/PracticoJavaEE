@@ -18,5 +18,5 @@ RUN wget https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-runner/11.0.18/j
 # Copy WAR from build stage
 COPY --from=build /app/target/*.war app.war
 
-# Run application
-CMD ["sh", "-c", "java -jar jetty-runner-11.0.18.jar --port ${PORT:-8080} app.war"]
+# Run application with root context
+CMD ["sh", "-c", "java -jar jetty-runner-11.0.18.jar --port ${PORT:-8080} --path / app.war"]
