@@ -28,7 +28,8 @@ public class TrabajadorSaludDAO implements TrabajadorSaludDAOLocal, TrabajadorSa
     
     // Lista thread-safe para almacenar los trabajadores
     private List<TrabajadorSalud> trabajadores;
-    
+
+    //Hola soy un commit nuevo !
     /**
      * Inicializa el DAO al arrancar la aplicación.
      */
