@@ -1,6 +1,8 @@
 package com.ejercicio1.business;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Clase que representa las estadísticas del sistema.
@@ -14,9 +16,11 @@ public class EstadisticasSistema implements Serializable {
     private int trabajadoresInactivos;
     private String especialidadMasComun;
     private double porcentajeActivos;
+    private Map<String, Integer> trabajadoresPorEspecialidad;
     
     // Constructor
     public EstadisticasSistema() {
+        this.trabajadoresPorEspecialidad = new HashMap<>();
     }
     
     // Getters y Setters
@@ -58,5 +62,13 @@ public class EstadisticasSistema implements Serializable {
     
     public void setPorcentajeActivos(double porcentajeActivos) {
         this.porcentajeActivos = porcentajeActivos;
+    }
+    
+    public Map<String, Integer> getTrabajadoresPorEspecialidad() {
+        return trabajadoresPorEspecialidad;
+    }
+    
+    public void setTrabajadoresPorEspecialidad(Map<String, Integer> trabajadoresPorEspecialidad) {
+        this.trabajadoresPorEspecialidad = trabajadoresPorEspecialidad;
     }
 }

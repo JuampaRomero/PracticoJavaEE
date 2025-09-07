@@ -8,6 +8,7 @@ import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -185,7 +186,7 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             stats.setPorcentajeActivos(0.0);
         }
         
-        // Encontrar la especialidad más común
+        // Encontrar la especialidad más común y contar trabajadores por especialidad
         if (!todos.isEmpty()) {
             Map<String, Long> especialidadCount = todos.stream()
                     .collect(Collectors.groupingBy(
@@ -199,8 +200,15 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
                     .orElse("N/A");
             
             stats.setEspecialidadMasComun(especialidadMasComun);
+            
+            // Convertir el Map<String, Long> a Map<String, Integer>
+            Map<String, Integer> trabajadoresPorEspecialidad = new HashMap<>();
+            especialidadCount.forEach((key, value) -> 
+                trabajadoresPorEspecialidad.put(key, value.intValue()));
+            stats.setTrabajadoresPorEspecialidad(trabajadoresPorEspecialidad);
         } else {
             stats.setEspecialidadMasComun("N/A");
+            stats.setTrabajadoresPorEspecialidad(new HashMap<>());
         }
         
         return stats;

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/main-template.xhtml">
+    
+    <ui:define name="title">Estadísticas - Gestor de Identidades</ui:define>
+    
+    <ui:define name="content">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard de Estadísticas</h1>
+            <p class="text-gray-600 mt-1">Visualización de datos y métricas del sistema</p>
+        </div>
+        
+        <!-- Tarjetas de resumen -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Total de Trabajadores -->
+            <div class="stat-card group hover:border-blue-500 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Total Trabajadores</p>
+                        <p class="text-3xl font-bold text-gray-900">#{estadisticasBean.estadisticas.totalTrabajadores}</p>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-users text-2xl text-blue-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-sm text-gray-500">Registrados en el sistema</p>
+                </div>
+            </div>
+            
+            <!-- Trabajadores Activos -->
+            <div class="stat-card group hover:border-green-500 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Activos</p>
+                        <p class="text-3xl font-bold text-green-600">#{estadisticasBean.estadisticas.trabajadoresActivos}</p>
+                    </div>
+                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-user-check text-2xl text-green-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-500">Porcentaje</p>
+                        <p class="text-sm font-semibold text-green-600">
+                            <h:outputText value="#{estadisticasBean.porcentajeActivos}">
+                                <f:convertNumber pattern="#0.0"/>
+                            </h:outputText>%
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trabajadores Inactivos -->
+            <div class="stat-card group hover:border-red-500 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Inactivos</p>
+                        <p class="text-3xl font-bold text-red-600">#{estadisticasBean.estadisticas.trabajadoresInactivos}</p>
+                    </div>
+                    <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-user-times text-2xl text-red-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-500">Porcentaje</p>
+                        <p class="text-sm font-semibold text-red-600">
+                            <h:outputText value="#{estadisticasBean.porcentajeInactivos}">
+                                <f:convertNumber pattern="#0.0"/>
+                            </h:outputText>%
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Especialidades -->
+            <div class="stat-card group hover:border-purple-500 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Especialidades</p>
+                        <p class="text-3xl font-bold text-purple-600">#{estadisticasBean.numeroEspecialidades}</p>
+                    </div>
+                    <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-stethoscope text-2xl text-purple-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-sm text-gray-500">Diferentes especialidades</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Gráfico de Dona - Estado de Trabajadores -->
+            <div class="modern-card">
+                <div class="card-header">
+                    <h3 class="card-title flex items-center">
+                        <i class="fas fa-chart-pie text-blue-500 mr-2"></i>
+                        Estado de Trabajadores
+                    </h3>
+                </div>
+                <div class="p-4">
+                    <p:donutChart model="#{estadisticasBean.donutModel}" 
+                                  style="width: 100%; height: 300px;"
+                                  rendered="#{estadisticasBean.estadisticas.totalTrabajadores gt 0}"/>
+                    
+                    <!-- Sin datos -->
+                    <div class="text-center py-12" 
+                         rendered="#{estadisticasBean.estadisticas.totalTrabajadores eq 0}">
+                        <i class="fas fa-chart-pie text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-600">No hay datos para mostrar</p>
+                    </div>
+                </div>
+                
+                <!-- Leyenda personalizada -->
+                <div class="p-4 bg-gray-50 border-t border-gray-200">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                            <span class="text-sm text-gray-700">Activos: #{estadisticasBean.estadisticas.trabajadoresActivos}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                            <span class="text-sm text-gray-700">Inactivos: #{estadisticasBean.estadisticas.trabajadoresInactivos}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico de Barras - Por Especialidad -->
+            <div class="modern-card">
+                <div class="card-header">
+                    <h3 class="card-title flex items-center">
+                        <i class="fas fa-chart-bar text-purple-500 mr-2"></i>
+                        Distribución por Especialidad
+                    </h3>
+                </div>
+                <div class="p-4">
+                    <p:barChart model="#{estadisticasBean.barModel}" 
+                               style="width: 100%; height: 300px;"
+                               rendered="#{estadisticasBean.numeroEspecialidades gt 0}"/>
+                    
+                    <!-- Sin datos -->
+                    <div class="text-center py-12" 
+                         rendered="#{estadisticasBean.numeroEspecialidades eq 0}">
+                        <i class="fas fa-chart-bar text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-600">No hay datos para mostrar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <!-- Especialidad más común -->
+            <div class="modern-card">
+                <div class="flex items-start">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-trophy text-xl text-blue-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900 mb-1">Especialidad más común</h4>
+                        <p class="text-2xl font-bold text-blue-600">#{estadisticasBean.especialidadMasComun}</p>
+                        <p class="text-sm text-gray-600 mt-1">Con mayor número de trabajadores</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Promedio por especialidad -->
+            <div class="modern-card">
+                <div class="flex items-start">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-calculator text-xl text-purple-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900 mb-1">Promedio por especialidad</h4>
+                        <p class="text-2xl font-bold text-purple-600">
+                            <h:outputText value="#{estadisticasBean.numeroEspecialidades gt 0 ? estadisticasBean.estadisticas.totalTrabajadores / estadisticasBean.numeroEspecialidades : 0}">
+                                <f:convertNumber pattern="#0.0"/>
+                            </h:outputText>
+                        </p>
+                        <p class="text-sm text-gray-600 mt-1">Trabajadores por especialidad</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasa de actividad -->
+            <div class="modern-card">
+                <div class="flex items-start">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-percentage text-xl text-green-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900 mb-1">Tasa de actividad</h4>
+                        <p class="text-2xl font-bold text-green-600">
+                            <h:outputText value="#{estadisticasBean.porcentajeActivos}">
+                                <f:convertNumber pattern="#0.0"/>
+                            </h:outputText>%
+                        </p>
+                        <p class="text-sm text-gray-600 mt-1">De trabajadores activos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla detallada por especialidad -->
+        <div class="modern-card mt-6">
+            <div class="card-header">
+                <h3 class="card-title flex items-center">
+                    <i class="fas fa-table text-indigo-500 mr-2"></i>
+                    Detalle por Especialidad
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left font-medium text-gray-700">Especialidad</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-700">Cantidad</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-700">Porcentaje</th>
+                            <th class="px-6 py-3 text-right font-medium text-gray-700">Visualización</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ui:repeat value="#{estadisticasBean.estadisticas.trabajadoresPorEspecialidad.entrySet()}" var="entry">
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-gray-900">#{entry.key}</td>
+                                <td class="px-6 py-4 text-center">#{entry.value}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <h:outputText value="#{entry.value * 100.0 / estadisticasBean.estadisticas.totalTrabajadores}">
+                                        <f:convertNumber pattern="#0.0"/>
+                                    </h:outputText>%
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-end items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-4 mr-2">
+                                            <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-4 rounded-full"
+                                                 style="width: #{entry.value * 100.0 / estadisticasBean.estadisticas.totalTrabajadores}%">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -10,9 +10,40 @@
     <!-- Asegurar que se escaneen las anotaciones -->
     <absolute-ordering/>
     
+    <!-- Configuración de JSF -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <!-- Mapeo de JSF -->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Parámetros de contexto JSF -->
+    <context-param>
+        <param-name>jakarta.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+    
+    <!-- Tema de PrimeFaces -->
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>saga-blue</param-value>
+    </context-param>
+    
+    <!-- Habilitar Font Awesome en PrimeFaces -->
+    <context-param>
+        <param-name>primefaces.FONT_AWESOME</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    
     <!-- Página de bienvenida -->
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.xhtml</welcome-file>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 </web-app>

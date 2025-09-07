@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><ui:insert name="title">Gestor de Identidades - Sistema de Salud</ui:insert></title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Custom CSS -->
+    <h:outputStylesheet library="css" name="app.css"/>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    
+    <style>
+        /* Configuración adicional de Tailwind */
+        @layer utilities {
+            .animate-fade-in {
+                animation: fadeIn 0.3s ease-out;
+            }
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="main-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="app-logo">
+                    <i class="fas fa-heartbeat text-3xl text-blue-500"></i>
+                    <h1>Gestor de Identidades</h1>
+                </div>
+                
+                <nav class="nav-menu">
+                    <h:link outcome="inicio" styleClass="nav-link #{view.viewId.contains('index') ? 'active' : ''}">
+                        <i class="fas fa-home mr-2"></i>Inicio
+                    </h:link>
+                    <h:link outcome="listar" styleClass="nav-link #{view.viewId.contains('/trabajadores/listar') ? 'active' : ''}">
+                        <i class="fas fa-users mr-2"></i>Trabajadores
+                    </h:link>
+                    <h:link outcome="registrar" styleClass="nav-link #{view.viewId.contains('/trabajadores/registrar') ? 'active' : ''}">
+                        <i class="fas fa-user-plus mr-2"></i>Registrar
+                    </h:link>
+                    <h:link outcome="buscar" styleClass="nav-link #{view.viewId.contains('/trabajadores/buscar') ? 'active' : ''}">
+                        <i class="fas fa-search mr-2"></i>Buscar
+                    </h:link>
+                    <h:link outcome="estadisticas" styleClass="nav-link #{view.viewId.contains('/estadisticas') ? 'active' : ''}">
+                        <i class="fas fa-chart-bar mr-2"></i>Estadísticas
+                    </h:link>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Contenido Principal -->
+        <main class="content-wrapper animate-fade-in">
+            <ui:insert name="content">
+                <!-- Contenido de cada página -->
+            </ui:insert>
+        </main>
+        
+        <!-- Footer minimalista -->
+        <footer class="mt-auto border-t border-gray-200 bg-white">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <p class="text-sm text-gray-600">
+                        © 2025 Gestor de Identidades - Sistema de Gestión de Trabajadores de la Salud
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-gray-500">
+                            <i class="fas fa-code mr-1"></i>Desarrollado con JSF + PrimeFaces
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Scripts adicionales -->
+    <ui:insert name="scripts">
+        <!-- Scripts específicos de cada página -->
+    </ui:insert>
+</h:body>
+</html>

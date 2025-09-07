@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/main-template.xhtml">
+    
+    <ui:define name="title">Buscar Trabajador - Gestor de Identidades</ui:define>
+    
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900">Búsqueda de Trabajadores</h1>
+                <p class="text-gray-600 mt-1">Encuentra trabajadores por cédula o especialidad</p>
+            </div>
+            
+            <!-- Mensajes -->
+            <p:messages id="messages" showDetail="true" closable="true" styleClass="mb-4">
+                <p:autoUpdate/>
+            </p:messages>
+            
+            <!-- Opciones de búsqueda -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Búsqueda por Cédula -->
+                <div class="modern-card">
+                    <div class="card-header">
+                        <h3 class="card-title flex items-center">
+                            <i class="fas fa-id-card text-blue-500 mr-2"></i>
+                            Buscar por Cédula
+                        </h3>
+                    </div>
+                    <div class="space-y-4">
+                        <p class="text-sm text-gray-600">
+                            Ingrese el número de cédula del trabajador que desea buscar
+                        </p>
+                        <div class="flex gap-3">
+                            <p:inputText id="busquedaCedula" 
+                                         value="#{trabajadorBean.busquedaCedula}"
+                                         placeholder="Ej: 12345678"
+                                         styleClass="flex-1 form-control">
+                                <p:ajax event="keyup" delay="300" update="btnBuscarCedula"/>
+                            </p:inputText>
+                            <p:commandButton id="btnBuscarCedula"
+                                             value="Buscar" 
+                                             action="#{trabajadorBean.buscarPorCedula}"
+                                             update="resultados"
+                                             styleClass="p-button-primary"
+                                             icon="pi pi-search"
+                                             disabled="#{empty trabajadorBean.busquedaCedula}">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Búsqueda por Especialidad -->
+                <div class="modern-card">
+                    <div class="card-header">
+                        <h3 class="card-title flex items-center">
+                            <i class="fas fa-stethoscope text-purple-500 mr-2"></i>
+                            Buscar por Especialidad
+                        </h3>
+                    </div>
+                    <div class="space-y-4">
+                        <p class="text-sm text-gray-600">
+                            Seleccione una especialidad para ver todos los trabajadores asociados
+                        </p>
+                        <div class="flex gap-3">
+                            <p:selectOneMenu id="busquedaEspecialidad" 
+                                             value="#{trabajadorBean.busquedaEspecialidad}"
+                                             styleClass="flex-1 form-control">
+                                <f:selectItem itemLabel="-- Seleccione especialidad --" 
+                                              itemValue="" 
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{trabajadorBean.especialidades}" 
+                                               var="esp" 
+                                               itemLabel="#{esp}" 
+                                               itemValue="#{esp}"/>
+                                <p:ajax event="change" update="btnBuscarEspecialidad"/>
+                            </p:selectOneMenu>
+                            <p:commandButton id="btnBuscarEspecialidad"
+                                             value="Buscar" 
+                                             action="#{trabajadorBean.buscarPorEspecialidad}"
+                                             update="resultados"
+                                             styleClass="p-button-primary"
+                                             icon="pi pi-search"
+                                             disabled="#{empty trabajadorBean.busquedaEspecialidad}">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botón para limpiar búsqueda -->
+            <div class="text-center mb-6">
+                <p:commandButton value="Limpiar Búsqueda" 
+                                 action="#{trabajadorBean.limpiarFiltros}"
+                                 update="@form"
+                                 styleClass="p-button-secondary"
+                                 icon="pi pi-filter-slash">
+                </p:commandButton>
+            </div>
+            
+            <!-- Resultados de búsqueda -->
+            <p:outputPanel id="resultados">
+                <div class="modern-card" rendered="#{not empty trabajadorBean.trabajadores}">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Resultados de la búsqueda 
+                            <span class="text-sm font-normal text-gray-600">
+                                (#{trabajadorBean.trabajadores.size()} #{trabajadorBean.trabajadores.size() eq 1 ? 'resultado' : 'resultados'})
+                            </span>
+                        </h3>
+                    </div>
+                    
+                    <!-- Grid de resultados -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <ui:repeat value="#{trabajadorBean.trabajadores}" var="trabajador">
+                            <div class="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-900">
+                                            #{trabajador.nombre} #{trabajador.apellido}
+                                        </h4>
+                                        <p class="text-sm text-gray-600 font-mono">
+                                            CI: #{trabajador.cedula}
+                                        </p>
+                                    </div>
+                                    <span class="#{trabajador.activo ? 'px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-800' : 'px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-800'}">
+                                        #{trabajador.activo ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-briefcase-medical text-blue-500 mr-2 w-4"></i>
+                                        <span class="text-gray-700">#{trabajador.especialidad}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-id-badge text-purple-500 mr-2 w-4"></i>
+                                        <span class="text-gray-700">Matrícula: #{trabajador.matriculaProfesional}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar text-green-500 mr-2 w-4"></i>
+                                        <span class="text-gray-700">
+                                            Ingreso: 
+                                            <h:outputText value="#{trabajador.fechaIngreso}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy" type="localDate"/>
+                                            </h:outputText>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3 pt-3 border-t border-gray-100">
+                                    <p:commandButton value="Ver detalles" 
+                                                     oncomplete="PF('dlgDetalle').show()"
+                                                     update=":form:detalle-content"
+                                                     process="@this"
+                                                     styleClass="p-button-text p-button-sm w-full"
+                                                     icon="pi pi-eye">
+                                        <f:setPropertyActionListener value="#{trabajador}" 
+                                                                   target="#{trabajadorBean.trabajadorSeleccionado}"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </div>
+                </div>
+                
+                <!-- Sin resultados -->
+                <div class="modern-card text-center py-12" 
+                     rendered="#{empty trabajadorBean.trabajadores and (not empty trabajadorBean.busquedaCedula or not empty trabajadorBean.busquedaEspecialidad)}">
+                    <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">No se encontraron resultados</h3>
+                    <p class="text-gray-600">
+                        Intente con otros criterios de búsqueda
+                    </p>
+                </div>
+            </p:outputPanel>
+            
+            <!-- Diálogo de detalles -->
+            <p:dialog header="Información del Trabajador" 
+                      widgetVar="dlgDetalle" 
+                      modal="true" 
+                      showEffect="fade" 
+                      hideEffect="fade" 
+                      responsive="true"
+                      width="600"
+                      styleClass="modern-dialog">
+                <p:outputPanel id="detalle-content" styleClass="p-4">
+                    <div rendered="#{not empty trabajadorBean.trabajadorSeleccionado}">
+                        <!-- Header con nombre y estado -->
+                        <div class="flex items-start justify-between mb-6">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">
+                                    #{trabajadorBean.trabajadorSeleccionado.nombre} #{trabajadorBean.trabajadorSeleccionado.apellido}
+                                </h3>
+                                <p class="text-gray-600">CI: #{trabajadorBean.trabajadorSeleccionado.cedula}</p>
+                            </div>
+                            <span class="#{trabajadorBean.trabajadorSeleccionado.activo ? 'px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800' : 'px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800'}">
+                                <i class="fas #{trabajadorBean.trabajadorSeleccionado.activo ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i>
+                                #{trabajadorBean.trabajadorSeleccionado.activo ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </div>
+                        
+                        <!-- Información detallada -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-sm font-semibold text-gray-700 block mb-1">
+                                        <i class="fas fa-briefcase-medical mr-1 text-blue-500"></i>
+                                        Especialidad
+                                    </label>
+                                    <p class="text-gray-900">#{trabajadorBean.trabajadorSeleccionado.especialidad}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-semibold text-gray-700 block mb-1">
+                                        <i class="fas fa-id-badge mr-1 text-purple-500"></i>
+                                        Matrícula Profesional
+                                    </label>
+                                    <p class="text-gray-900">#{trabajadorBean.trabajadorSeleccionado.matriculaProfesional}</p>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-sm font-semibold text-gray-700 block mb-1">
+                                        <i class="fas fa-calendar-check mr-1 text-green-500"></i>
+                                        Fecha de Ingreso
+                                    </label>
+                                    <p class="text-gray-900">
+                                        <h:outputText value="#{trabajadorBean.trabajadorSeleccionado.fechaIngreso}">
+                                            <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy" type="localDate" locale="es"/>
+                                        </h:outputText>
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-semibold text-gray-700 block mb-1">
+                                        <i class="fas fa-clock mr-1 text-orange-500"></i>
+                                        Antigüedad
+                                    </label>
+                                    <p class="text-gray-900">
+                                        <!-- Cálculo aproximado de antigüedad -->
+                                        #{trabajadorBean.trabajadorSeleccionado.fechaIngreso.until(java.time.LocalDate.now()).getYears()} años
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
