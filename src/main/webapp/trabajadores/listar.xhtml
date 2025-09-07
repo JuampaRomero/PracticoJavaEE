@@ -144,27 +144,7 @@
                     </f:facet>
                 </p:dataTable>
             </div>
-            
-            <!-- Botones de exportación -->
-            <div class="flex gap-3 mt-4">
-                <h:commandButton styleClass="btn btn-secondary">
-                    <i class="fas fa-file-excel mr-2"></i>
-                    <p:dataExporter type="xlsx" target="dt-trabajadores" fileName="trabajadores"/>
-                    Exportar Excel
-                </h:commandButton>
-                
-                <h:commandButton styleClass="btn btn-secondary">
-                    <i class="fas fa-file-pdf mr-2"></i>
-                    <p:dataExporter type="pdf" target="dt-trabajadores" fileName="trabajadores"/>
-                    Exportar PDF
-                </h:commandButton>
-                
-                <h:commandButton styleClass="btn btn-secondary">
-                    <i class="fas fa-file-csv mr-2"></i>
-                    <p:dataExporter type="csv" target="dt-trabajadores" fileName="trabajadores"/>
-                    Exportar CSV
-                </h:commandButton>
-            </div>
+
             
             <!-- Diálogo de detalles -->
             <p:dialog header="Detalles del Trabajador" 
