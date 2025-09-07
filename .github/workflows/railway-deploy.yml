@@ -1,0 +1,81 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Run tests
+      run: mvn test
+    
+    - name: Build WAR
+      run: mvn clean package -DskipTests
+    
+    - name: Upload WAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: war-artifact
+        path: target/*.war
+        retention-days: 1
+
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Railway CLI
+      run: npm install -g @railway/cli
+    
+    - name: Deploy to Railway
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway up --service ${{ secrets.RAILWAY_SERVICE_NAME }}
+    
+    - name: Show deployment URL
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        echo "Deployment completed!"
+        echo "Check your Railway dashboard for the deployment URL"
+        railway status
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [test, deploy]
+    if: always()
+    
+    steps:
+    - name: Check deployment status
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ]; then
+          echo "✅ Deployment to Railway was successful!"
+        elif [ "${{ needs.test.result }}" == "failure" ]; then
+          echo "❌ Tests failed. Deployment was not attempted."
+        else
+          echo "❌ Deployment failed. Check the logs for details."
+        fi

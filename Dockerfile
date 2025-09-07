@@ -1,22 +1,36 @@
-# Build stage
-FROM maven:3.8.5-openjdk-17-slim AS build
+# Etapa de construcción
+FROM maven:3.9.4-eclipse-temurin-17 AS build
+
+# Establecer directorio de trabajo
 WORKDIR /app
+
+# Copiar archivos de Maven
 COPY pom.xml .
 COPY src ./src
+
+# Construir la aplicación
 RUN mvn clean package -DskipTests
 
-# Runtime stage  
-FROM quay.io/wildfly/wildfly:31.0.0.Final-jdk17
+# Etapa de ejecución
+FROM eclipse-temurin:17-jre-alpine
 
-# Copiar el WAR al directorio de deployments
-COPY --from=build /app/target/GestorIdentidades-1.0-SNAPSHOT.war /opt/jboss/wildfly/standalone/deployments/GestorIdentidades.war
+# Instalar curl para health checks
+RUN apk add --no-cache curl
 
-# Copiar script de inicio
-COPY start.sh /opt/jboss/wildfly/bin/start.sh
-RUN chmod +x /opt/jboss/wildfly/bin/start.sh
+# Crear directorio de aplicación
+WORKDIR /app
 
-# Exponer el puerto (Railway usa PORT dinámicamente)
-EXPOSE 8080
+# Descargar Jetty Runner
+RUN wget https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-runner/11.0.18/jetty-runner-11.0.18.jar -O jetty-runner.jar
 
-# Usar el script de inicio
-CMD ["/opt/jboss/wildfly/bin/start.sh"]
+# Copiar el WAR desde la etapa de construcción
+COPY --from=build /app/target/*.war /app/GestorIdentidades.war
+
+# Exponer puerto dinámico de Railway
+EXPOSE ${PORT}
+
+# Configurar variables de entorno para optimización
+ENV JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+
+# Comando de inicio usando la variable PORT de Railway
+CMD java $JAVA_OPTS -jar jetty-runner.jar --port $PORT GestorIdentidades.war
