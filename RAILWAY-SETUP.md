@@ -58,6 +58,32 @@ Una vez desplegado, tu aplicación estará disponible en:
 
 ## Troubleshooting
 
+### Si el build falla por dependencias Maven:
+Este es un problema común en Railway. Soluciones:
+
+1. **Opción 1 - Build local + Docker simple:**
+   ```bash
+   # Construir localmente
+   mvn clean package
+   
+   # Usar Dockerfile.simple
+   # En railway.json, cambiar dockerfilePath a "Dockerfile.simple"
+   ```
+
+2. **Opción 2 - Usar script de build:**
+   ```bash
+   # Hacer ejecutable el script
+   chmod +x railway-build.sh
+   
+   # En Railway, configurar build command:
+   # ./railway-build.sh
+   ```
+
+3. **Opción 3 - Configurar proxy Maven:**
+   En Railway, agregar variables:
+   - `MAVEN_OPTS`: `-Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080`
+   - `MAVEN_SETTINGS`: Configuración personalizada
+
 ### Si el deployment falla:
 1. Revisa los logs en Railway Dashboard
 2. Verifica que el WAR se construye correctamente: `mvn clean package`
@@ -71,6 +97,11 @@ Una vez desplegado, tu aplicación estará disponible en:
 1. Verifica el health check en Railway
 2. Revisa los logs de Jetty Runner
 3. Asegúrate que los servlets estén correctamente mapeados
+
+### Errores comunes:
+- **"Failed to download dependencies"**: Usar Dockerfile mejorado con reintentos
+- **"Out of memory"**: Aumentar MAVEN_OPTS en railway.json
+- **"Port binding error"**: Asegurar que se use $PORT de Railway
 
 ### Comandos útiles:
 ```bash
