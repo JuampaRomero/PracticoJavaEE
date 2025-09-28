@@ -3,12 +3,14 @@ package com.ejercicio1.web.beans;
 import com.ejercicio1.business.BusinessException;
 import com.ejercicio1.business.TrabajadorSaludServiceLocal;
 import com.ejercicio1.entities.TrabajadorSalud;
+import com.ejercicio1.jms.JMSMessageSender;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
+import jakarta.jms.JMSException;
 import org.primefaces.PrimeFaces;
 
 import java.io.Serializable;
@@ -28,12 +30,16 @@ public class TrabajadorBean implements Serializable {
     @EJB
     private TrabajadorSaludServiceLocal trabajadorService;
     
+    @EJB
+    private JMSMessageSender jmsMessageSender;
+    
     private List<TrabajadorSalud> trabajadores;
     private List<TrabajadorSalud> trabajadoresFiltrados;
     private TrabajadorSalud trabajadorSeleccionado;
     private TrabajadorSalud nuevoTrabajador;
     private String busquedaCedula;
     private String busquedaEspecialidad;
+    private boolean usarJMS = false; // Flag para determinar si usar JMS o alta directa
     
     @PostConstruct
     public void init() {
@@ -80,6 +86,51 @@ public class TrabajadorBean implements Serializable {
             addErrorMessage("Error de validación", e.getMessage());
         } catch (Exception e) {
             addErrorMessage("Error al guardar", "Ocurrió un error al guardar el trabajador: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Guarda un nuevo trabajador vía JMS (procesamiento asíncrono)
+     */
+    public void guardarTrabajadorJMS() {
+        try {
+            // Realizar validaciones básicas antes de enviar
+            if (nuevoTrabajador.getCedula() == null || nuevoTrabajador.getCedula().trim().isEmpty()) {
+                addErrorMessage("Error de validación", "La cédula es obligatoria");
+                return;
+            }
+            if (nuevoTrabajador.getNombre() == null || nuevoTrabajador.getNombre().trim().isEmpty()) {
+                addErrorMessage("Error de validación", "El nombre es obligatorio");
+                return;
+            }
+            if (nuevoTrabajador.getApellido() == null || nuevoTrabajador.getApellido().trim().isEmpty()) {
+                addErrorMessage("Error de validación", "El apellido es obligatorio");
+                return;
+            }
+            
+            // Enviar mensaje a la cola JMS
+            jmsMessageSender.enviarMensajeAlta(nuevoTrabajador);
+            
+            addSuccessMessage("Solicitud enviada", 
+                "La solicitud de alta para " + nuevoTrabajador.getNombre() + " " + 
+                nuevoTrabajador.getApellido() + " ha sido enviada. Será procesada de forma asíncrona.");
+            
+            // Resetear el formulario
+            nuevoTrabajador = new TrabajadorSalud();
+            nuevoTrabajador.setFechaIngreso(LocalDate.now());
+            nuevoTrabajador.setActivo(true);
+            
+            // Cerrar el diálogo si se está usando uno
+            PrimeFaces.current().executeScript("PF('dlgNuevoTrabajador').hide()");
+            PrimeFaces.current().ajax().update("form:messages");
+            
+            // Recargar trabajadores después de un pequeño delay para dar tiempo al MDB
+            PrimeFaces.current().executeScript("setTimeout(function() { PF('widgetVar').filter(); }, 3000);");
+            
+        } catch (JMSException e) {
+            addErrorMessage("Error al enviar mensaje", "No se pudo enviar la solicitud: " + e.getMessage());
+        } catch (Exception e) {
+            addErrorMessage("Error inesperado", "Ocurrió un error: " + e.getMessage());
         }
     }
     
@@ -244,5 +295,13 @@ public class TrabajadorBean implements Serializable {
     
     public void setBusquedaEspecialidad(String busquedaEspecialidad) {
         this.busquedaEspecialidad = busquedaEspecialidad;
+    }
+    
+    public boolean isUsarJMS() {
+        return usarJMS;
+    }
+    
+    public void setUsarJMS(boolean usarJMS) {
+        this.usarJMS = usarJMS;
     }
 }
