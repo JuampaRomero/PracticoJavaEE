@@ -8,32 +8,17 @@ public class TrabajadorSalud implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    // Atributo tipo String
-    private String cedula;  // Identificador único
-    
-    // Atributo tipo String
+    private String cedula;
     private String nombre;
-    
-    // Atributo tipo String
     private String apellido;
-    
-    // Atributo tipo String
     private String especialidad;
-    
-    // Atributo tipo numérico (Integer)
     private Integer matriculaProfesional;
-    
-    // Atributo tipo fecha (LocalDate)
     private LocalDate fechaIngreso;
-    
-    // Atributo tipo boolean
     private boolean activo;
     
-    // Constructor vacío
     public TrabajadorSalud() {
     }
     
-    // Constructor completo
     public TrabajadorSalud(String cedula, String nombre, String apellido, 
                           String especialidad, Integer matriculaProfesional, 
                           LocalDate fechaIngreso, boolean activo) {
@@ -45,8 +30,6 @@ public class TrabajadorSalud implements Serializable {
         this.fechaIngreso = fechaIngreso;
         this.activo = activo;
     }
-    
-    // Getters y Setters
     public String getCedula() {
         return cedula;
     }

@@ -19,22 +19,18 @@ import java.util.List;
 @WebServlet(name="agregarTrabajadorServlet", value="/agregar-trabajador")
 public class AgregarTrabajadorServlet extends HttpServlet {
     
-    // Inyección del servicio de negocio
     @EJB
     private TrabajadorSaludServiceLocal trabajadorService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //Retornamos el formulario de agregar trabajador al usuario
         request.getRequestDispatcher("/agregar-trabajador.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Encoding de caracteres especiales
         request.setCharacterEncoding("UTF-8");
 
-        // Obtenemos parametros del form
         String cedula = request.getParameter("cedula");
         String nombre = request.getParameter("nombre");
         String apellido = request.getParameter("apellido");
@@ -43,15 +39,11 @@ public class AgregarTrabajadorServlet extends HttpServlet {
         String fechaIngresoStr = request.getParameter("fechaIngreso");
         String activoStr = request.getParameter("activo");
         
-        // Variables para manejar datos convertidos
         Integer matricula = null;
         LocalDate fechaIngreso = null;
         boolean activo = "true".equals(activoStr);
         
-        // Lista de errores para validación básica de formato
         List<String> errores = new ArrayList<>();
-        
-        // Validación y conversión de matrícula
         try {
             if (matriculaProfesionalStr != null && !matriculaProfesionalStr.trim().isEmpty()) {
                 matricula = Integer.parseInt(matriculaProfesionalStr);
@@ -60,7 +52,6 @@ public class AgregarTrabajadorServlet extends HttpServlet {
             errores.add("La matrícula debe ser un número válido");
         }
         
-        // Validación y conversión de fecha
         try {
             if (fechaIngresoStr != null && !fechaIngresoStr.trim().isEmpty()) {
                 fechaIngreso = LocalDate.parse(fechaIngresoStr);
@@ -69,7 +60,6 @@ public class AgregarTrabajadorServlet extends HttpServlet {
             errores.add("Formato de fecha inválido");
         }
         
-        // Si hay errores de formato, volver al formulario
         if (!errores.isEmpty()) {
             volverAlFormularioConErrores(request, response, errores, cedula, nombre, 
                                        apellido, especialidad, matriculaProfesionalStr, 
@@ -77,7 +67,6 @@ public class AgregarTrabajadorServlet extends HttpServlet {
             return;
         }
         
-        // Crear el nuevo trabajador
         TrabajadorSalud nuevoTrabajador = new TrabajadorSalud(
                 cedula != null ? cedula.trim() : "",
                 nombre != null ? nombre.trim() : "",
@@ -89,19 +78,14 @@ public class AgregarTrabajadorServlet extends HttpServlet {
         );
         
         try {
-            // Usar el servicio EJB para agregar el trabajador
-            // El servicio se encarga de todas las validaciones de negocio
             trabajadorService.agregarTrabajador(nuevoTrabajador);
             
-            // Establecer mensaje de éxito
             request.setAttribute("mensaje", "Trabajador de salud agregado exitosamente");
             request.setAttribute("trabajador", nuevoTrabajador);
             
-            // Redirigir a página de confirmación
             request.getRequestDispatcher("/confirmacion.jsp").forward(request, response);
             
         } catch (BusinessException e) {
-            // Si hay un error de negocio, mostrar el mensaje específico
             errores.add(e.getMessage());
             volverAlFormularioConErrores(request, response, errores, cedula, nombre, 
                                        apellido, especialidad, matriculaProfesionalStr, 
@@ -109,10 +93,7 @@ public class AgregarTrabajadorServlet extends HttpServlet {
         }
     }
     
-    /**
-     * Método auxiliar para volver al formulario con errores
-     */
-    private void volverAlFormularioConErrores(HttpServletRequest request, 
+    private void volverAlFormularioConErrores(HttpServletRequest request,
                                              HttpServletResponse response,
                                              List<String> errores,
                                              String cedula, String nombre, String apellido,

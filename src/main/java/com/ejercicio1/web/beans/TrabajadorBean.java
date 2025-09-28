@@ -18,9 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Managed Bean para gestionar las operaciones de trabajadores en la interfaz web
- */
 @Named("trabajadorBean")
 @SessionScoped
 public class TrabajadorBean implements Serializable {
@@ -39,7 +36,7 @@ public class TrabajadorBean implements Serializable {
     private TrabajadorSalud nuevoTrabajador;
     private String busquedaCedula;
     private String busquedaEspecialidad;
-    private boolean usarJMS = false; // Flag para determinar si usar JMS o alta directa
+    private boolean usarJMS = false;
     
     @PostConstruct
     public void init() {
@@ -49,9 +46,6 @@ public class TrabajadorBean implements Serializable {
         nuevoTrabajador.setActivo(true);
     }
     
-    /**
-     * Carga todos los trabajadores del sistema
-     */
     public void cargarTrabajadores() {
         try {
             trabajadores = trabajadorService.obtenerTodos();
@@ -61,9 +55,6 @@ public class TrabajadorBean implements Serializable {
         }
     }
     
-    /**
-     * Guarda un nuevo trabajador
-     */
     public void guardarTrabajador() {
         try {
             trabajadorService.agregarTrabajador(nuevoTrabajador);
@@ -73,12 +64,10 @@ public class TrabajadorBean implements Serializable {
                 "El trabajador " + nuevoTrabajador.getNombre() + " " + 
                 nuevoTrabajador.getApellido() + " ha sido registrado exitosamente.");
             
-            // Resetear el formulario
             nuevoTrabajador = new TrabajadorSalud();
             nuevoTrabajador.setFechaIngreso(LocalDate.now());
             nuevoTrabajador.setActivo(true);
             
-            // Cerrar el diálogo si se está usando uno
             PrimeFaces.current().executeScript("PF('dlgNuevoTrabajador').hide()");
             PrimeFaces.current().ajax().update("form:messages", "form:dt-trabajadores");
             
@@ -89,12 +78,9 @@ public class TrabajadorBean implements Serializable {
         }
     }
     
-    /**
-     * Guarda un nuevo trabajador vía JMS (procesamiento asíncrono)
-     */
+    // Procesamiento asíncrono vía JMS
     public void guardarTrabajadorJMS() {
         try {
-            // Realizar validaciones básicas antes de enviar
             if (nuevoTrabajador.getCedula() == null || nuevoTrabajador.getCedula().trim().isEmpty()) {
                 addErrorMessage("Error de validación", "La cédula es obligatoria");
                 return;
@@ -108,23 +94,19 @@ public class TrabajadorBean implements Serializable {
                 return;
             }
             
-            // Enviar mensaje a la cola JMS
             jmsMessageSender.enviarMensajeAlta(nuevoTrabajador);
             
             addSuccessMessage("Solicitud enviada", 
                 "La solicitud de alta para " + nuevoTrabajador.getNombre() + " " + 
                 nuevoTrabajador.getApellido() + " ha sido enviada. Será procesada de forma asíncrona.");
             
-            // Resetear el formulario
             nuevoTrabajador = new TrabajadorSalud();
             nuevoTrabajador.setFechaIngreso(LocalDate.now());
             nuevoTrabajador.setActivo(true);
             
-            // Cerrar el diálogo si se está usando uno
             PrimeFaces.current().executeScript("PF('dlgNuevoTrabajador').hide()");
             PrimeFaces.current().ajax().update("form:messages");
             
-            // Recargar trabajadores después de un pequeño delay para dar tiempo al MDB
             PrimeFaces.current().executeScript("setTimeout(function() { PF('widgetVar').filter(); }, 3000);");
             
         } catch (JMSException e) {
@@ -134,9 +116,6 @@ public class TrabajadorBean implements Serializable {
         }
     }
     
-    /**
-     * Busca un trabajador por cédula
-     */
     public void buscarPorCedula() {
         if (busquedaCedula == null || busquedaCedula.trim().isEmpty()) {
             addWarnMessage("Búsqueda vacía", "Por favor ingrese una cédula para buscar");
@@ -159,9 +138,6 @@ public class TrabajadorBean implements Serializable {
         }
     }
     
-    /**
-     * Busca trabajadores por especialidad
-     */
     public void buscarPorEspecialidad() {
         if (busquedaEspecialidad == null || busquedaEspecialidad.trim().isEmpty()) {
             addWarnMessage("Búsqueda vacía", "Por favor seleccione una especialidad para buscar");
@@ -182,9 +158,6 @@ public class TrabajadorBean implements Serializable {
         }
     }
     
-    /**
-     * Limpia los filtros y recarga todos los trabajadores
-     */
     public void limpiarFiltros() {
         busquedaCedula = null;
         busquedaEspecialidad = null;
@@ -193,25 +166,16 @@ public class TrabajadorBean implements Serializable {
         addInfoMessage("Filtros limpiados", "Se han limpiado todos los filtros");
     }
     
-    /**
-     * Prepara el formulario para un nuevo trabajador
-     */
     public void prepararNuevoTrabajador() {
         nuevoTrabajador = new TrabajadorSalud();
         nuevoTrabajador.setFechaIngreso(LocalDate.now());
         nuevoTrabajador.setActivo(true);
     }
     
-    /**
-     * Verifica si hay trabajadores cargados
-     */
     public boolean hayTrabajadores() {
         return trabajadores != null && !trabajadores.isEmpty();
     }
     
-    /**
-     * Obtiene las especialidades únicas para el filtro
-     */
     public List<String> getEspecialidades() {
         List<String> especialidades = new ArrayList<>();
         especialidades.add("Medicina General");
@@ -227,7 +191,6 @@ public class TrabajadorBean implements Serializable {
         return especialidades;
     }
     
-    // Métodos de utilidad para mensajes
     private void addSuccessMessage(String summary, String detail) {
         FacesContext.getCurrentInstance().addMessage(null, 
             new FacesMessage(FacesMessage.SEVERITY_INFO, summary, detail));
@@ -248,7 +211,6 @@ public class TrabajadorBean implements Serializable {
             new FacesMessage(FacesMessage.SEVERITY_INFO, summary, detail));
     }
     
-    // Getters y Setters
     public List<TrabajadorSalud> getTrabajadores() {
         return trabajadores;
     }

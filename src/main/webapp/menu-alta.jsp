@@ -124,22 +124,6 @@
             </div>
         </div>
         
-        <div class="info-section">
-            <h3>¿Cuándo usar cada opción?</h3>
-            <ul>
-                <li><strong>Alta Directa:</strong> Cuando necesita confirmación inmediata y validación en tiempo real.</li>
-                <li><strong>Alta vía JMS:</strong> Para procesar grandes volúmenes de datos o cuando no requiere confirmación inmediata.</li>
-            </ul>
-            
-            <h3>Ventajas de JMS</h3>
-            <ul>
-                <li>Procesamiento asíncrono que no bloquea la aplicación</li>
-                <li>Mayor escalabilidad para procesar múltiples solicitudes</li>
-                <li>Tolerancia a fallos: los mensajes persisten hasta ser procesados</li>
-                <li>Permite integración con sistemas externos</li>
-            </ul>
-        </div>
-        
         <div style="margin-top: 30px; text-align: center;">
             <a href="${pageContext.request.contextPath}/" style="color: #6c757d; text-decoration: none;">
                 ← Volver al inicio

@@ -16,11 +16,7 @@ import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Message Driven Bean para procesar alta de TrabajadorSalud.
- * Escucha mensajes de la cola queue_alta_trabajadorsalud.
- * El formato del mensaje es: cedula|nombre|apellido|especialidad|matriculaProfesional|fechaIngreso|activo
- */
+// Formato mensaje: cedula|nombre|apellido|especialidad|matriculaProfesional|fechaIngreso|activo
 @MessageDriven(
     activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "jakarta.jms.Queue"),
@@ -44,10 +40,8 @@ public class TrabajadorSaludMDB implements MessageListener {
                 String contenido = textMessage.getText();
                 LOGGER.log(Level.INFO, "Mensaje recibido: {0}", contenido);
                 
-                // Parsear el mensaje y crear el trabajador
                 TrabajadorSalud trabajador = parsearMensaje(contenido);
                 
-                // Realizar el alta del trabajador
                 trabajadorSaludService.agregarTrabajador(trabajador);
                 
                 LOGGER.log(Level.INFO, "Trabajador agregado exitosamente: {0}", trabajador.getCedula());
@@ -66,13 +60,6 @@ public class TrabajadorSaludMDB implements MessageListener {
         }
     }
     
-    /**
-     * Parsea el mensaje de texto y crea un objeto TrabajadorSalud.
-     * 
-     * @param mensaje String con formato: cedula|nombre|apellido|especialidad|matriculaProfesional|fechaIngreso|activo
-     * @return TrabajadorSalud con los datos parseados
-     * @throws IllegalArgumentException si el formato es inválido
-     */
     private TrabajadorSalud parsearMensaje(String mensaje) {
         if (mensaje == null || mensaje.trim().isEmpty()) {
             throw new IllegalArgumentException("Mensaje vacío");
@@ -87,26 +74,20 @@ public class TrabajadorSaludMDB implements MessageListener {
         try {
             TrabajadorSalud trabajador = new TrabajadorSalud();
             
-            // cedula
             trabajador.setCedula(campos[0].trim());
             
-            // nombre
             trabajador.setNombre(campos[1].trim());
             
-            // apellido
             trabajador.setApellido(campos[2].trim());
             
-            // especialidad
             trabajador.setEspecialidad(campos[3].trim());
             
-            // matriculaProfesional
             try {
                 trabajador.setMatriculaProfesional(Integer.parseInt(campos[4].trim()));
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Matrícula profesional debe ser un número entero");
             }
             
-            // fechaIngreso
             try {
                 LocalDate fecha = LocalDate.parse(campos[5].trim(), DATE_FORMATTER);
                 trabajador.setFechaIngreso(fecha);
@@ -114,7 +95,6 @@ public class TrabajadorSaludMDB implements MessageListener {
                 throw new IllegalArgumentException("Fecha de ingreso debe tener formato ISO (YYYY-MM-DD)");
             }
             
-            // activo
             String activoStr = campos[6].trim().toLowerCase();
             if ("true".equals(activoStr) || "1".equals(activoStr) || "si".equals(activoStr)) {
                 trabajador.setActivo(true);

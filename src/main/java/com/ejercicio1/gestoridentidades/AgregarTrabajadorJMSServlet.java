@@ -127,10 +127,7 @@ public class AgregarTrabajadorJMSServlet extends HttpServlet {
                                        fechaIngresoStr, activo);
         }
     }
-    
-    /**
-     * Método auxiliar para volver al formulario con errores
-     */
+
     private void volverAlFormularioConErrores(HttpServletRequest request, 
                                              HttpServletResponse response,
                                              List<String> errores,

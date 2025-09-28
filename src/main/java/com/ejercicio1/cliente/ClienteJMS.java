@@ -180,9 +180,6 @@ public class ClienteJMS {
             
         } catch (NamingException e) {
             System.err.println("Error al conectar con el servidor JMS:");
-            System.err.println("- Verifique que WildFly esté ejecutándose");
-            System.err.println("- Verifique que la cola esté configurada");
-            System.err.println("- Verifique las credenciales si es necesario");
             e.printStackTrace();
         } catch (Exception e) {
             System.err.println("Error inesperado: " + e.getMessage());

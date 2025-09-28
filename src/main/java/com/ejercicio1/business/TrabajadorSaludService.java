@@ -14,41 +14,30 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
-/**
- * Implementación del servicio de negocio para TrabajadorSalud.
- * Este es un Stateless Session Bean que implementa la lógica de negocio.
- */
 @Stateless
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, TrabajadorSaludServiceRemote {
     
     private static final Logger LOGGER = Logger.getLogger(TrabajadorSaludService.class.getName());
     
-    // Inyección del DAO
     @EJB
     private TrabajadorSaludDAOLocal trabajadorDAO;
     
-    /**
-     * Agrega un nuevo trabajador aplicando las reglas de negocio.
-     * Reglas de negocio implementadas:
-     * 1. La cédula debe tener entre 7 y 10 dígitos
-     * 2. El nombre y apellido deben tener al menos 2 caracteres
-     * 3. La matrícula profesional debe ser mayor a 1000
-     * 4. La fecha de ingreso no puede ser futura ni anterior a 1950
-     * 5. Los trabajadores nuevos deben estar activos por defecto
-     */
+    // Reglas de negocio:
+    // 1. Cédula: 7-10 dígitos
+    // 2. Nombre/Apellido: mínimo 2 caracteres
+    // 3. Matrícula: > 1000
+    // 4. Fecha ingreso: 1950 - presente
+    // 5. Nuevos trabajadores activos por defecto
     @Override
     public void agregarTrabajador(TrabajadorSalud trabajador) throws BusinessException {
-        // Validar el trabajador
         validarTrabajador(trabajador);
         
-        // Si es nuevo y no se especificó el estado, activarlo por defecto
         if (trabajador.getFechaIngreso().isAfter(LocalDate.now().minusDays(30))) {
             trabajador.setActivo(true);
         }
         
         try {
-            // Delegar al DAO para persistir
             trabajadorDAO.agregar(trabajador);
             LOGGER.info("Trabajador agregado exitosamente: " + trabajador.getCedula());
         } catch (IllegalArgumentException e) {
@@ -56,16 +45,12 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
         }
     }
     
-    /**
-     * Valida que un trabajador cumpla con todas las reglas de negocio.
-     */
     @Override
     public void validarTrabajador(TrabajadorSalud trabajador) throws BusinessException {
         if (trabajador == null) {
             throw new BusinessException("El trabajador no puede ser null");
         }
         
-        // Validar cédula
         if (trabajador.getCedula() == null || trabajador.getCedula().trim().isEmpty()) {
             throw new BusinessException("La cédula es obligatoria");
         }
@@ -75,22 +60,18 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             throw new BusinessException("La cédula debe contener entre 7 y 10 dígitos numéricos");
         }
         
-        // Validar nombre
         if (trabajador.getNombre() == null || trabajador.getNombre().trim().length() < 2) {
             throw new BusinessException("El nombre debe tener al menos 2 caracteres");
         }
         
-        // Validar apellido
         if (trabajador.getApellido() == null || trabajador.getApellido().trim().length() < 2) {
             throw new BusinessException("El apellido debe tener al menos 2 caracteres");
         }
         
-        // Validar especialidad
         if (trabajador.getEspecialidad() == null || trabajador.getEspecialidad().trim().isEmpty()) {
             throw new BusinessException("La especialidad es obligatoria");
         }
         
-        // Validar matrícula profesional
         if (trabajador.getMatriculaProfesional() == null) {
             throw new BusinessException("La matrícula profesional es obligatoria");
         }
@@ -99,7 +80,6 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             throw new BusinessException("La matrícula profesional debe ser mayor a 1000");
         }
         
-        // Validar fecha de ingreso
         if (trabajador.getFechaIngreso() == null) {
             throw new BusinessException("La fecha de ingreso es obligatoria");
         }
@@ -116,18 +96,12 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
         }
     }
     
-    /**
-     * Obtiene todos los trabajadores de salud.
-     */
     @Override
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<TrabajadorSalud> obtenerTodos() {
         return trabajadorDAO.obtenerTodos();
     }
     
-    /**
-     * Busca trabajadores por especialidad.
-     */
     @Override
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<TrabajadorSalud> buscarPorEspecialidad(String especialidad) {
@@ -145,9 +119,6 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Busca un trabajador por su cédula.
-     */
     @Override
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public TrabajadorSalud buscarPorCedula(String cedula) {
@@ -155,7 +126,6 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             return null;
         }
         
-        // Validar formato de cédula
         if (!cedula.trim().matches("\\d{7,10}")) {
             return null;
         }
@@ -163,9 +133,6 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
         return trabajadorDAO.buscarPorCedula(cedula);
     }
     
-    /**
-     * Obtiene las estadísticas del sistema.
-     */
     @Override
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public EstadisticasSistema obtenerEstadisticas() {
@@ -179,14 +146,12 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
         stats.setTrabajadoresActivos(activos);
         stats.setTrabajadoresInactivos(total - activos);
         
-        // Calcular porcentaje de activos
         if (total > 0) {
             stats.setPorcentajeActivos((activos * 100.0) / total);
         } else {
             stats.setPorcentajeActivos(0.0);
         }
         
-        // Encontrar la especialidad más común y contar trabajadores por especialidad
         if (!todos.isEmpty()) {
             Map<String, Long> especialidadCount = todos.stream()
                     .collect(Collectors.groupingBy(
@@ -201,7 +166,6 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             
             stats.setEspecialidadMasComun(especialidadMasComun);
             
-            // Convertir el Map<String, Long> a Map<String, Integer>
             Map<String, Integer> trabajadoresPorEspecialidad = new HashMap<>();
             especialidadCount.forEach((key, value) -> 
                 trabajadoresPorEspecialidad.put(key, value.intValue()));
