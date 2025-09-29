@@ -2,6 +2,7 @@ package com.ejercicio1.ws.rest.resources;
 
 import com.ejercicio1.business.BusinessException;
 import com.ejercicio1.business.TrabajadorSaludServiceLocal;
+import com.ejercicio1.entities.TrabajadorSalud;
 import com.ejercicio1.ws.rest.dto.ResponseWrapper;
 import com.ejercicio1.ws.rest.dto.TrabajadorDTO;
 import com.ejercicio1.ws.rest.mappers.TrabajadorMapper;
@@ -22,23 +23,35 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TrabajadorResource {
-    
+
     @EJB
     private TrabajadorSaludServiceLocal trabajadorService;
-    
-    /**
-     * GET /trabajadores
-     * Obtiene todos los trabajadores
-     */
+
+    //instanciar trabajador mapper
+    private TrabajadorMapper trabajadorMapper = new TrabajadorMapper();
+
+    //Retorno todos los trabajadores
     @GET
     public Response obtenerTodos() {
-        // TODO: Implementar la obtención de todos los trabajadores
-        // 1. Llamar a trabajadorService.obtenerTodos()
-        // 2. Convertir la lista de entities a DTOs usando TrabajadorMapper
-        // 3. Envolver en ResponseWrapper con success
-        // 4. Retornar Response.ok() con el wrapper
-        throw new UnsupportedOperationException("Método no implementado");
+        try {
+            List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
+            List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadores);
+
+            ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                    ResponseWrapper.success(trabajadoresDTOs, "Trabajadores obtenidos exitosamente");
+
+            return Response.ok(responseWrapper).build();
+        } catch (Exception e) {
+
+            ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                    ResponseWrapper.error(e.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseWrapper)
+                    .build();
+        }
     }
+
     
     /**
      * GET /trabajadores/{cedula}
@@ -49,10 +62,33 @@ public class TrabajadorResource {
     public Response obtenerPorCedula(@PathParam("cedula") String cedula) {
         // TODO: Implementar la búsqueda por cédula
         // 1. Validar que la cédula no sea null o vacía
-        // 2. Llamar a trabajadorService.buscarPorCedula(cedula)
-        // 3. Si no se encuentra, retornar 404 con mensaje de error
-        // 4. Si se encuentra, convertir a DTO y retornar en ResponseWrapper
-        throw new UnsupportedOperationException("Método no implementado");
+        if (!cedula.isEmpty()) {
+            // 2. Llamar a trabajadorService.buscarPorCedula(cedula)
+            TrabajadorSalud trabajadorPorCedula = trabajadorService.buscarPorCedula(cedula);
+            if (!trabajadorPorCedula.equals(null)) {
+                // 3. Si se encuentra, convertir a DTO y retornar en ResponseWrapper
+                TrabajadorDTO trabajadorDTO = TrabajadorMapper.toDTO(trabajadorPorCedula);
+                ResponseWrapper<TrabajadorDTO> responseWrapper =
+                        ResponseWrapper.success(trabajadorDTO, "Trabajador encontrado exitosamente");
+            } else {
+                ResponseWrapper<TrabajadorDTO> responseWrapper =
+                        ResponseWrapper.error("Trabajador no encontrado con cédula: " + cedula);
+
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseWrapper)
+                        .build();
+            }
+        } else {
+            ResponseWrapper<TrabajadorDTO> responseWrapper =
+                    ResponseWrapper.error("La cédula no puede ser nula o vacía");
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(responseWrapper)
+                    .build();
+            {
+
+            }
+        }
     }
     
     /**
@@ -62,13 +98,32 @@ public class TrabajadorResource {
     @POST
     public Response crear(TrabajadorDTO trabajadorDTO) {
         // TODO: Implementar la creación de trabajador
-        // 1. Validar que el DTO no sea null
-        // 2. Convertir DTO a Entity usando TrabajadorMapper
-        // 3. Llamar a trabajadorService.agregarTrabajador()
-        // 4. Si hay BusinessException, capturarla y retornar 400
-        // 5. Si es exitoso, retornar 201 (Created) con el trabajador creado
-        throw new UnsupportedOperationException("Método no implementado");
+        if (trabajadorDTO != null) {
+            TrabajadorSalud trabajadorEntity = TrabajadorMapper.toEntity(trabajadorDTO);
+            try {
+                trabajadorService.agregarTrabajador(trabajadorEntity);
+                ResponseWrapper<TrabajadorDTO> responseWrapper =
+                        ResponseWrapper.success(trabajadorDTO, "Trabajador creado exitosamente");
+                return Response.status(Response.Status.CREATED).build();
+            } catch (BusinessException e) {
+                ResponseWrapper<TrabajadorDTO> responseWrapper =
+                        ResponseWrapper.error("Fallo al crear el Trabajador: " + e.getMessage());
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(responseWrapper)
+                        .build();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        }else{
+            ResponseWrapper<TrabajadorDTO> responseWrapper =
+                    ResponseWrapper.error("El Trabajador no puede ser nulo");
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(responseWrapper)
+                    .build();
+        }
     }
+
     
     /**
      * PUT /trabajadores/{cedula}
