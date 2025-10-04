@@ -56,4 +56,6 @@ public interface TrabajadorSaludServiceLocal {
      * @throws BusinessException si no cumple alguna regla
      */
     void validarTrabajador(TrabajadorSalud trabajador) throws BusinessException;
+
+    void eliminarTrabajador(String cedula) throws BusinessException;
 }

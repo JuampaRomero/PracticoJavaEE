@@ -60,35 +60,33 @@ public class TrabajadorResource {
     @GET
     @Path("/{cedula}")
     public Response obtenerPorCedula(@PathParam("cedula") String cedula) {
-        // TODO: Implementar la búsqueda por cédula
-        // 1. Validar que la cédula no sea null o vacía
-        if (!cedula.isEmpty()) {
-            // 2. Llamar a trabajadorService.buscarPorCedula(cedula)
-            TrabajadorSalud trabajadorPorCedula = trabajadorService.buscarPorCedula(cedula);
-            if (!trabajadorPorCedula.equals(null)) {
-                // 3. Si se encuentra, convertir a DTO y retornar en ResponseWrapper
-                TrabajadorDTO trabajadorDTO = TrabajadorMapper.toDTO(trabajadorPorCedula);
-                ResponseWrapper<TrabajadorDTO> responseWrapper =
-                        ResponseWrapper.success(trabajadorDTO, "Trabajador encontrado exitosamente");
-            } else {
-                ResponseWrapper<TrabajadorDTO> responseWrapper =
-                        ResponseWrapper.error("Trabajador no encontrado con cédula: " + cedula);
+       // Validar que la cédula no sea null o vacía
+       if (!cedula.isEmpty()) {
+           // Llamar a trabajadorService.buscarPorCedula(cedula)
+           TrabajadorSalud trabajadorPorCedula = trabajadorService.buscarPorCedula(cedula);
+           if (trabajadorPorCedula != null) {
+               // Si se encuentra, convertir a DTO y retornar en ResponseWrapper
+               TrabajadorDTO trabajadorDTO = TrabajadorMapper.toDTO(trabajadorPorCedula);
+               ResponseWrapper<TrabajadorDTO> responseWrapper =
+                       ResponseWrapper.success(trabajadorDTO, "Trabajador encontrado exitosamente");
 
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity(responseWrapper)
-                        .build();
-            }
-        } else {
-            ResponseWrapper<TrabajadorDTO> responseWrapper =
-                    ResponseWrapper.error("La cédula no puede ser nula o vacía");
+               return Response.ok(responseWrapper).build(); // Fixed: Added return statement
+           } else {
+               ResponseWrapper<TrabajadorDTO> responseWrapper =
+                       ResponseWrapper.error("Trabajador no encontrado con cédula: " + cedula);
 
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(responseWrapper)
-                    .build();
-            {
+               return Response.status(Response.Status.NOT_FOUND)
+                       .entity(responseWrapper)
+                       .build();
+           }
+       } else {
+           ResponseWrapper<TrabajadorDTO> responseWrapper =
+                   ResponseWrapper.error("La cédula no puede ser nula o vacía");
 
-            }
-        }
+           return Response.status(Response.Status.BAD_REQUEST)
+                   .entity(responseWrapper)
+                   .build();
+       }
     }
     
     /**
@@ -125,21 +123,55 @@ public class TrabajadorResource {
     }
 
     
-    /**
-     * PUT /trabajadores/{cedula}
-     * Actualiza un trabajador existente
-     */
+
+    // PUT /trabajadores/{cedula} Actualiza un trabajador existente
+
     @PUT
     @Path("/{cedula}")
     public Response actualizar(@PathParam("cedula") String cedula, TrabajadorDTO trabajadorDTO) {
         // TODO: Implementar la actualización
+
         // 1. Validar parámetros
-        // 2. Verificar que el trabajador existe (buscarPorCedula)
-        // 3. Actualizar los campos (excepto la cédula)
-        // 4. Guardar cambios
-        // 5. Retornar el trabajador actualizado
-        // Nota: El servicio actual no tiene método update, considerar agregarlo o usar workaround
-        throw new UnsupportedOperationException("Método no implementado");
+        if(!cedula.isEmpty()){
+            // 2. Verificar que el trabajador existe (buscarPorCedula)
+            TrabajadorSalud tds = trabajadorService.buscarPorCedula(cedula);
+            if(!tds.equals(null)){
+                try {
+                    // 3. Actualizar los campos (excepto la cédula)
+                    tds.setNombre(trabajadorDTO.getNombre());
+                    tds.setApellido(trabajadorDTO.getApellido());
+                    tds.setEspecialidad(trabajadorDTO.getEspecialidad());
+                    tds.setMatriculaProfesional(trabajadorDTO.getMatriculaProfesional());
+                    tds.setFechaIngreso(trabajadorDTO.getFechaIngreso());
+                    tds.setActivo(trabajadorDTO.isActivo());
+                    TrabajadorDTO trabajadorActualizadoDTO = TrabajadorMapper.toDTO(tds);
+                    ResponseWrapper<TrabajadorDTO> responseWrapper =
+                            ResponseWrapper.success(trabajadorActualizadoDTO, "Trabajador actualizado exitosamente");
+                    return Response.ok(responseWrapper).build();
+                } catch (RuntimeException e) {
+                    ResponseWrapper<TrabajadorDTO> responseWrapper =
+                            ResponseWrapper.error("Fallo al actualizar el Trabajador: " + e.getMessage());
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(responseWrapper)
+                            .build();
+                } catch(Exception e){throw new RuntimeException(e);}
+            }else{
+                ResponseWrapper<TrabajadorDTO> responseWrapper =
+                        ResponseWrapper.error("Trabajador no encontrado con cédula: " + cedula);
+
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseWrapper)
+                        .build();
+            }
+        }else{
+            ResponseWrapper<TrabajadorDTO> responseWrapper =
+                    ResponseWrapper.error("La cédula no puede ser nula o vacía");
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(responseWrapper)
+                    .build();
+        }
+
     }
     
     /**
@@ -149,13 +181,35 @@ public class TrabajadorResource {
     @DELETE
     @Path("/{cedula}")
     public Response eliminar(@PathParam("cedula") String cedula) {
-        // TODO: Implementar la eliminación lógica
-        // 1. Buscar el trabajador por cédula
-        // 2. Si no existe, retornar 404
-        // 3. Cambiar el estado a inactivo (soft delete)
-        // 4. Guardar cambios
-        // 5. Retornar 204 (No Content) o 200 con mensaje de confirmación
-        throw new UnsupportedOperationException("Método no implementado");
+        if(!cedula.isEmpty()){
+            TrabajadorSalud tds = trabajadorService.buscarPorCedula(cedula);
+            if(!tds.equals(null)) {
+                try {
+                    trabajadorService.eliminarTrabajador(cedula);
+                    return Response.noContent().build();
+
+                } catch (BusinessException e) {
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                ResponseWrapper<TrabajadorDTO> responseWrapper =
+                        ResponseWrapper.error("Trabajador no encontrado con cédula: " + cedula);
+
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseWrapper)
+                        .build();
+
+            }
+        }else{
+            ResponseWrapper<TrabajadorDTO> responseWrapper =
+                    ResponseWrapper.error("La cédula no puede ser nula o vacía");
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(responseWrapper)
+                    .build();
+        }
     }
     
     /**
@@ -167,10 +221,29 @@ public class TrabajadorResource {
     public Response buscarPorEspecialidad(@PathParam("especialidad") String especialidad) {
         // TODO: Implementar búsqueda por especialidad
         // 1. Validar parámetro
-        // 2. Llamar a trabajadorService.buscarPorEspecialidad()
-        // 3. Convertir resultados a DTOs
-        // 4. Retornar lista envuelta en ResponseWrapper
-        throw new UnsupportedOperationException("Método no implementado");
+        if(!especialidad.isEmpty()){
+            List<TrabajadorSalud> trabajadoresPorEspecialidad = trabajadorService.buscarPorEspecialidad(especialidad);
+            if(!trabajadoresPorEspecialidad.equals(null)){
+                List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadoresPorEspecialidad);
+                ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                        ResponseWrapper.success(trabajadoresDTOs, "Trabajadores con especialidad " + especialidad + " encontrados exitosamente");
+                return Response.ok(responseWrapper).build();
+            }else{
+                ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                        ResponseWrapper.error("No se encontraron trabajadores con la especialidad: " + especialidad);
+
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseWrapper)
+                        .build();
+            }
+        }else{
+            ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                    ResponseWrapper.error("La especialidad no puede ser nula o vacía");
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(responseWrapper)
+                    .build();
+        }
     }
     
     /**
@@ -182,9 +255,27 @@ public class TrabajadorResource {
     public Response obtenerActivos() {
         // TODO: Implementar filtrado de trabajadores activos
         // 1. Obtener todos los trabajadores
-        // 2. Filtrar solo los activos
-        // 3. Convertir a DTOs y retornar
-        throw new UnsupportedOperationException("Método no implementado");
+        try {
+            List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
+            List<TrabajadorSalud> trabajadoresActivos = trabajadores.stream()
+                    .filter(TrabajadorSalud::isActivo)
+                    .toList();
+            if(!trabajadoresActivos.isEmpty()){
+                List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadoresActivos);
+                ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                        ResponseWrapper.success(trabajadoresDTOs, "Trabajadores activos obtenidos exitosamente");
+                return Response.ok(responseWrapper).build();
+            }else{
+                ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                        ResponseWrapper.error("No se encontraron trabajadores activos");
+
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseWrapper)
+                        .build();
+            }
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
     
     /**
@@ -195,14 +286,35 @@ public class TrabajadorResource {
     @GET
     @Path("/buscar")
     public Response buscar(
+            //Esto despues tenemos que cambiarlo por parametros que esten indexados en la BD, o indexar por estos supongo..
             @QueryParam("nombre") String nombre,
             @QueryParam("apellido") String apellido,
             @QueryParam("especialidad") String especialidad,
             @QueryParam("activo") Boolean activo) {
         // TODO: Implementar búsqueda con filtros múltiples
-        // 1. Obtener todos los trabajadores
-        // 2. Aplicar filtros según los parámetros recibidos
-        // 3. Retornar resultados filtrados
-        throw new UnsupportedOperationException("Método no implementado");
+
+        try {
+            List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
+            List<TrabajadorSalud> trabajadoresPorFiltro = trabajadores.stream()
+                    .filter(t -> (nombre == null || t.getNombre().equalsIgnoreCase(nombre)) &&
+                            (apellido == null || t.getApellido().equalsIgnoreCase(apellido)) &&
+                            (especialidad == null || t.getEspecialidad().equalsIgnoreCase(especialidad)) &&
+                            (activo == null || t.isActivo() == activo))
+                    .toList();
+            if(trabajadoresPorFiltro.stream().count() > 0) {
+                List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadoresPorFiltro);
+                ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                        ResponseWrapper.success(trabajadoresDTOs, "Trabajadores encontrados con los filtros proporcionados");
+                return Response.ok(responseWrapper).build();
+            }else{
+                ResponseWrapper<List<TrabajadorDTO>> responseWrapper =
+                        ResponseWrapper.error("No se encontraron trabajadores con los filtros proporcionados");
+
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseWrapper)
+                        .build();
+            }
+        } catch (RuntimeException e) {throw new RuntimeException(e);
+        } catch (Exception e) {throw new RuntimeException(e);}}
     }
 }

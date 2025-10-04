@@ -63,4 +63,6 @@ public interface TrabajadorSaludDAOLocal {
      * @return El número de trabajadores activos
      */
     int contarTrabajadoresActivos();
+
+    void eliminar(TrabajadorSalud existente);
 }

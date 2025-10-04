@@ -103,6 +103,22 @@ public class TrabajadorSaludDAO implements TrabajadorSaludDAOLocal, TrabajadorSa
                 .count();
     }
     
+    @Override
+    @Lock(LockType.WRITE)
+    public void eliminar(TrabajadorSalud trabajador) {
+        if (trabajador == null) {
+            throw new IllegalArgumentException("El trabajador no puede ser null");
+        }
+        
+        boolean eliminado = trabajadores.removeIf(t -> t.getCedula().equals(trabajador.getCedula()));
+        
+        if (eliminado) {
+            LOGGER.info("Trabajador eliminado: " + trabajador.getCedula() + " - " + trabajador.getNombre() + " " + trabajador.getApellido());
+        } else {
+            LOGGER.warning("No se pudo eliminar el trabajador con cédula: " + trabajador.getCedula());
+        }
+    }
+    
     @Lock(LockType.WRITE)
     public void limpiarTodos() {
         trabajadores.clear();

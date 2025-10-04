@@ -44,6 +44,24 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
             throw new BusinessException("Error al agregar trabajador: " + e.getMessage());
         }
     }
+
+    public void eliminarTrabajador(String cedula) throws BusinessException {
+        if (cedula == null || cedula.trim().isEmpty()) {
+            throw new BusinessException("La cédula es obligatoria para eliminar un trabajador");
+        }
+
+        TrabajadorSalud existente = trabajadorDAO.buscarPorCedula(cedula);
+        if (existente == null) {
+            throw new BusinessException("No se encontró un trabajador con la cédula: " + cedula);
+        }
+
+        try {
+            trabajadorDAO.eliminar(existente);
+            LOGGER.info("Trabajador eliminado exitosamente: " + cedula);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Error al eliminar trabajador: " + e.getMessage());
+        }
+    }
     
     @Override
     public void validarTrabajador(TrabajadorSalud trabajador) throws BusinessException {
