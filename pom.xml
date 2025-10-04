@@ -58,6 +58,14 @@
             <artifactId>jersey-cdi2-se</artifactId>
             <version>4.0.0-M2</version>
         </dependency>
+        
+        <!-- Jakarta Web Services Metadata (JSR-181) para anotaciones @WebService -->
+        <dependency>
+            <groupId>jakarta.jws</groupId>
+            <artifactId>jakarta.jws-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
