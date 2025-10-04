@@ -76,42 +76,7 @@ public class TrabajadorSoapService {
             throw new RuntimeException("La cedula no puede ser nula");
         }
     }
-    /**
-     * =====;=============================================================================
-     * MÉTODO 3: crear
-     * ==================================================================================
-     * Crea un nuevo trabajador
-     * 
-     * PASOS A SEGUIR:
-     * 
-     * 1. Agregar la anotación @WebMethod
-     *    @WebMethod(operationName = "crearTrabajador")
-     * 
-     * 2. Definir el método que retorne TrabajadorDTO
-     *    public TrabajadorDTO crear(...)
-     * 
-     * 3. Agregar el parámetro TrabajadorDTO con @WebParam
-     *    @WebParam(name = "trabajador") TrabajadorDTO trabajadorDTO
-     * 
-     * 4. Validar que el trabajadorDTO no sea null
-     *    if (trabajadorDTO == null) {
-     *        throw new RuntimeException("El trabajador no puede ser nulo");
-     *    }
-     * 
-     * 5. Convertir el DTO a entidad usando el mapper
-     *    TrabajadorSalud trabajadorEntity = TrabajadorMapper.toEntity(trabajadorDTO);
-     * 
-     * 6. Llamar al servicio de negocio para agregar el trabajador
-     *    trabajadorService.agregarTrabajador(trabajadorEntity);
-     *    (Esto puede lanzar BusinessException, manejarlo en el catch)
-     * 
-     * 7. Retornar el DTO del trabajador creado
-     *    return trabajadorDTO;
-     * 
-     * 8. Manejar excepciones:
-     *    - BusinessException: throw new RuntimeException("Error de negocio: " + e.getMessage());
-     *    - Exception general: throw new RuntimeException("Error al crear trabajador: " + e.getMessage());
-     */
+
     // TODO: Implementar crear siguiendo los pasos anteriores
     @WebMethod(operationName = "crearTrabajadorSoap")
     public TrabajadorDTO crearTrabajador(@WebParam(name = "trabajador") TrabajadorDTO trabajador) {
@@ -129,106 +94,51 @@ public class TrabajadorSoapService {
             throw new RuntimeException("Trabajador no puede ser nulo");
         }
     }
-    /**
-     * ==================================================================================
-     * MÉTODO 4: actualizar
-     * ==================================================================================
-     * Actualiza un trabajador existente
-     * 
-     * PASOS A SEGUIR:
-     * 
-     * 1. Agregar la anotación @WebMethod
-     *    @WebMethod(operationName = "actualizarTrabajador")
-     * 
-     * 2. Definir el método que retorne TrabajadorDTO
-     *    public TrabajadorDTO actualizar(...)
-     * 
-     * 3. Agregar dos parámetros con @WebParam:
-     *    @WebParam(name = "cedula") String cedula,
-     *    @WebParam(name = "trabajador") TrabajadorDTO trabajadorDTO
-     * 
-     * 4. Validar que la cédula no sea null o vacía
-     *    if (cedula == null || cedula.isEmpty()) {
-     *        throw new RuntimeException("La cédula no puede ser nula o vacía");
-     *    }
-     * 
-     * 5. Validar que el trabajadorDTO no sea null
-     *    if (trabajadorDTO == null) {
-     *        throw new RuntimeException("El trabajador no puede ser nulo");
-     *    }
-     * 
-     * 6. Buscar el trabajador existente por cédula
-     *    TrabajadorSalud trabajadorExistente = trabajadorService.buscarPorCedula(cedula);
-     * 
-     * 7. Verificar que el trabajador existe
-     *    if (trabajadorExistente == null) {
-     *        throw new RuntimeException("Trabajador no encontrado con cédula: " + cedula);
-     *    }
-     * 
-     * 8. Actualizar los campos del trabajador (excepto la cédula):
-     *    trabajadorExistente.setNombre(trabajadorDTO.getNombre());
-     *    trabajadorExistente.setApellido(trabajadorDTO.getApellido());
-     *    trabajadorExistente.setEspecialidad(trabajadorDTO.getEspecialidad());
-     *    trabajadorExistente.setMatriculaProfesional(trabajadorDTO.getMatriculaProfesional());
-     *    trabajadorExistente.setFechaIngreso(trabajadorDTO.getFechaIngreso());
-     *    trabajadorExistente.setActivo(trabajadorDTO.isActivo());
-     * 
-     * 9. Persistir los cambios (si el servicio no lo hace automáticamente)
-     *    // Dependiendo de tu implementación, puede que necesites llamar a un método update
-     * 
-     * 10. Convertir la entidad actualizada a DTO
-     *     TrabajadorDTO trabajadorActualizadoDTO = TrabajadorMapper.toDTO(trabajadorExistente);
-     * 
-     * 11. Retornar el DTO actualizado
-     *     return trabajadorActualizadoDTO;
-     * 
-     * 12. Envolver en try-catch para manejar excepciones
-     */
-    // TODO: Implementar actualizar siguiendo los pasos anteriores
 
-    /**
-     * ==================================================================================
-     * MÉTODO 5: eliminar
-     * ==================================================================================
-     * Elimina (desactiva) un trabajador
-     * 
-     * PASOS A SEGUIR:
-     * 
-     * 1. Agregar la anotación @WebMethod
-     *    @WebMethod(operationName = "eliminarTrabajador")
-     * 
-     * 2. Definir el método que retorne boolean (para indicar éxito)
-     *    public boolean eliminar(...)
-     * 
-     * 3. Agregar el parámetro String cedula con @WebParam
-     *    @WebParam(name = "cedula") String cedula
-     * 
-     * 4. Validar que la cédula no sea null o vacía
-     *    if (cedula == null || cedula.isEmpty()) {
-     *        throw new RuntimeException("La cédula no puede ser nula o vacía");
-     *    }
-     * 
-     * 5. Buscar el trabajador para verificar que existe
-     *    TrabajadorSalud trabajador = trabajadorService.buscarPorCedula(cedula);
-     * 
-     * 6. Verificar que el trabajador existe
-     *    if (trabajador == null) {
-     *        throw new RuntimeException("Trabajador no encontrado con cédula: " + cedula);
-     *    }
-     * 
-     * 7. Llamar al servicio de negocio para eliminar el trabajador
-     *    trabajadorService.eliminarTrabajador(cedula);
-     *    (Esto puede lanzar BusinessException)
-     * 
-     * 8. Retornar true para indicar éxito
-     *    return true;
-     * 
-     * 9. Manejar excepciones:
-     *    - BusinessException: throw new RuntimeException("Error al eliminar: " + e.getMessage());
-     *    - Exception general: throw new RuntimeException("Error al eliminar trabajador: " + e.getMessage());
-     */
-    // TODO: Implementar eliminar siguiendo los pasos anteriores
+    public TrabajadorDTO actualizarTrabajador(
+            @WebParam(name = "trabajador") TrabajadorDTO trabajador,
+            @WebParam(name= "cedula") String cedula){
 
+        if(cedula != null && trabajador != null) {
+            try {
+                TrabajadorSalud tds = trabajadorService.buscarPorCedula(cedula);
+                tds.setNombre(trabajador.getNombre());
+                tds.setApellido(trabajador.getApellido());
+                tds.setEspecialidad(trabajador.getEspecialidad());
+                tds.setFechaIngreso(trabajador.getFechaIngreso());
+                tds.setActivo(trabajador.isActivo());
+
+                try {
+                    TrabajadorDTO trabajadorActualizado = TrabajadorMapper.toDTO(tds);
+                    return trabajadorActualizado;
+                } catch (RuntimeException e) {
+                    throw new RuntimeException(e);
+                }
+            }catch(RuntimeException e){
+                throw new RuntimeException("Error de negocio:" + e.getMessage());
+            }
+        }else{
+            throw new RuntimeException("El trabajador y su CI no pueden ser nulos");
+        }
+    }
+
+    public boolean eliminarTrabajador(@WebParam(name = "cedula") String cedula){
+        if(cedula != null) {
+            TrabajadorSalud tds =  trabajadorService.buscarPorCedula(cedula);
+            if(tds != null) {
+                try {
+                    trabajadorService.eliminarTrabajador(cedula);
+                    return true;
+                }catch(BusinessException e){
+                    throw new RuntimeException("Error de negocio:" + e.getMessage());
+                }
+            }else{
+                throw new RuntimeException("Trabajador no encontrado con CI: " + cedula);
+            }
+        }else{
+            throw new RuntimeException("El cedula no puede ser nula");
+        }
+    }
     /**
      * ==================================================================================
      * MÉTODO 6: buscarPorEspecialidad

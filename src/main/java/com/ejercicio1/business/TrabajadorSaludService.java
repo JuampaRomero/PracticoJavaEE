@@ -48,6 +48,7 @@ public class TrabajadorSaludService implements TrabajadorSaludServiceLocal, Trab
     public void eliminarTrabajador(String cedula) throws BusinessException {
         if (cedula == null || cedula.trim().isEmpty()) {
             throw new BusinessException("La cédula es obligatoria para eliminar un trabajador");
+
         }
 
         TrabajadorSalud existente = trabajadorDAO.buscarPorCedula(cedula);
