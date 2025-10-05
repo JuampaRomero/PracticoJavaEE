@@ -1,19 +1,39 @@
 package com.ejercicio1.entities;
 
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-
+/**
+ * Entidad JPA que representa un Trabajador de Salud
+ * Tabla: trabajadores_salud
+ */
+@Entity
+@Table(name = "trabajadores_salud")
 public class TrabajadorSalud implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
+    @Id
+    @Column(name = "cedula", nullable = false, length = 20)
     private String cedula;
+    
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
+    
+    @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
+    
+    @Column(name = "especialidad", length = 100)
     private String especialidad;
+    
+    @Column(name = "matricula_profesional")
     private Integer matriculaProfesional;
+    
+    @Column(name = "fecha_ingreso")
     private LocalDate fechaIngreso;
+    
+    @Column(name = "activo", nullable = false)
     private boolean activo;
     
     public TrabajadorSalud() {

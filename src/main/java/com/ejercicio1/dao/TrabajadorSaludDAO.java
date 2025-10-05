@@ -1,36 +1,27 @@
 package com.ejercicio1.dao;
 
 import com.ejercicio1.entities.TrabajadorSalud;
-import jakarta.annotation.PostConstruct;
-import jakarta.ejb.ConcurrencyManagement;
-import jakarta.ejb.ConcurrencyManagementType;
-import jakarta.ejb.Lock;
-import jakarta.ejb.LockType;
-import jakarta.ejb.Singleton;
-import jakarta.ejb.Startup;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-@Singleton
-@Startup
-@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
+/**
+ * DAO para TrabajadorSalud usando JPA y PostgreSQL
+ * Reemplaza la implementación en memoria por persistencia real en base de datos
+ */
+@Stateless
 public class TrabajadorSaludDAO implements TrabajadorSaludDAOLocal, TrabajadorSaludDAORemote {
     
     private static final Logger LOGGER = Logger.getLogger(TrabajadorSaludDAO.class.getName());
     
-    // Lista thread-safe para almacenar los trabajadores
-    private List<TrabajadorSalud> trabajadores;
-    @PostConstruct
-    public void init() {
-        trabajadores = new CopyOnWriteArrayList<>();
-        LOGGER.info("TrabajadorSaludDAO inicializado correctamente");
-    }
+    @PersistenceContext(unitName = "GestorIdentidadesPU")
+    private EntityManager entityManager;
     
     @Override
-    @Lock(LockType.WRITE)
     public void agregar(TrabajadorSalud trabajador) {
         if (trabajador == null) {
             throw new IllegalArgumentException("El trabajador no puede ser null");
@@ -44,88 +35,82 @@ public class TrabajadorSaludDAO implements TrabajadorSaludDAOLocal, TrabajadorSa
             throw new IllegalArgumentException("Ya existe un trabajador con la matrícula: " + trabajador.getMatriculaProfesional());
         }
         
-        trabajadores.add(trabajador);
-        LOGGER.info("Trabajador agregado: " + trabajador.getCedula() + " - " + trabajador.getNombre() + " " + trabajador.getApellido());
+        entityManager.persist(trabajador);
+        LOGGER.info("Trabajador persistido en BD: " + trabajador.getCedula() + " - " + trabajador.getNombre() + " " + trabajador.getApellido());
     }
     
     @Override
-    @Lock(LockType.READ)
     public List<TrabajadorSalud> obtenerTodos() {
-        return new ArrayList<>(trabajadores);
+        TypedQuery<TrabajadorSalud> query = entityManager.createQuery(
+            "SELECT t FROM TrabajadorSalud t", TrabajadorSalud.class);
+        return query.getResultList();
     }
     
     @Override
-    @Lock(LockType.READ)
     public TrabajadorSalud buscarPorCedula(String cedula) {
         if (cedula == null || cedula.trim().isEmpty()) {
             return null;
         }
         
-        return trabajadores.stream()
-                .filter(t -> t.getCedula().equals(cedula.trim()))
-                .findFirst()
-                .orElse(null);
+        return entityManager.find(TrabajadorSalud.class, cedula.trim());
     }
     
     @Override
-    @Lock(LockType.READ)
     public boolean existeCedula(String cedula) {
         if (cedula == null || cedula.trim().isEmpty()) {
             return false;
         }
         
-        return trabajadores.stream()
-                .anyMatch(t -> t.getCedula().equals(cedula.trim()));
+        return buscarPorCedula(cedula) != null;
     }
     
     @Override
-    @Lock(LockType.READ)
     public boolean existeMatricula(Integer matricula) {
         if (matricula == null) {
             return false;
         }
         
-        return trabajadores.stream()
-                .anyMatch(t -> t.getMatriculaProfesional().equals(matricula));
+        TypedQuery<Long> query = entityManager.createQuery(
+            "SELECT COUNT(t) FROM TrabajadorSalud t WHERE t.matriculaProfesional = :matricula", Long.class);
+        query.setParameter("matricula", matricula);
+        return query.getSingleResult() > 0;
     }
     
     @Override
-    @Lock(LockType.READ)
     public int contarTrabajadores() {
-        return trabajadores.size();
+        TypedQuery<Long> query = entityManager.createQuery(
+            "SELECT COUNT(t) FROM TrabajadorSalud t", Long.class);
+        return query.getSingleResult().intValue();
     }
     
     @Override
-    @Lock(LockType.READ)
     public int contarTrabajadoresActivos() {
-        return (int) trabajadores.stream()
-                .filter(TrabajadorSalud::isActivo)
-                .count();
+        TypedQuery<Long> query = entityManager.createQuery(
+            "SELECT COUNT(t) FROM TrabajadorSalud t WHERE t.activo = true", Long.class);
+        return query.getSingleResult().intValue();
     }
     
     @Override
-    @Lock(LockType.WRITE)
     public void eliminar(TrabajadorSalud trabajador) {
         if (trabajador == null) {
             throw new IllegalArgumentException("El trabajador no puede ser null");
         }
         
-        boolean eliminado = trabajadores.removeIf(t -> t.getCedula().equals(trabajador.getCedula()));
+        TrabajadorSalud trabajadorEnBD = entityManager.find(TrabajadorSalud.class, trabajador.getCedula());
         
-        if (eliminado) {
-            LOGGER.info("Trabajador eliminado: " + trabajador.getCedula() + " - " + trabajador.getNombre() + " " + trabajador.getApellido());
+        if (trabajadorEnBD != null) {
+            entityManager.remove(trabajadorEnBD);
+            LOGGER.info("Trabajador eliminado de BD: " + trabajador.getCedula() + " - " + trabajador.getNombre() + " " + trabajador.getApellido());
         } else {
             LOGGER.warning("No se pudo eliminar el trabajador con cédula: " + trabajador.getCedula());
         }
     }
     
-    @Lock(LockType.WRITE)
     public void limpiarTodos() {
-        trabajadores.clear();
-        LOGGER.warning("Todos los trabajadores han sido eliminados del sistema");
+        entityManager.createQuery("DELETE FROM TrabajadorSalud").executeUpdate();
+        LOGGER.warning("Todos los trabajadores han sido eliminados de la base de datos");
     }
     
-    @Lock(LockType.READ)
     public String obtenerEstadisticas() {
         int total = contarTrabajadores();
         int activos = contarTrabajadoresActivos();

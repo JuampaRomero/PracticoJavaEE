@@ -7,6 +7,7 @@ import com.ejercicio1.ws.rest.dto.TrabajadorDTO;
 import com.ejercicio1.ws.rest.mappers.TrabajadorMapper;
 
 import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebService;
@@ -26,6 +27,7 @@ import java.util.List;
  * 
  * URL del WSDL estará disponible en: http://localhost:8080/GestorIdentidades/TrabajadorSoapService?wsdl
  */
+@Stateless
 @WebService(
     name = "TrabajadorSoapService",
     serviceName = "TrabajadorSoapService",
@@ -61,7 +63,6 @@ public class TrabajadorSoapService {
         }
     }
 
-    // TODO: Implementar obtenerPorCedula siguiendo los pasos anteriores
     @WebMethod(operationName = "obtenerTrabajadorPorCI")
     public TrabajadorDTO obtenerTrabajadorPorCI(@WebParam(name = "cedula") String cedula) {
         if(cedula != null) {
@@ -77,7 +78,6 @@ public class TrabajadorSoapService {
         }
     }
 
-    // TODO: Implementar crear siguiendo los pasos anteriores
     @WebMethod(operationName = "crearTrabajadorSoap")
     public TrabajadorDTO crearTrabajador(@WebParam(name = "trabajador") TrabajadorDTO trabajador) {
         if(trabajador != null) {
@@ -95,6 +95,7 @@ public class TrabajadorSoapService {
         }
     }
 
+    @WebMethod(operationName = "actualizarTrabajador")
     public TrabajadorDTO actualizarTrabajador(
             @WebParam(name = "trabajador") TrabajadorDTO trabajador,
             @WebParam(name= "cedula") String cedula){
@@ -122,6 +123,7 @@ public class TrabajadorSoapService {
         }
     }
 
+    @WebMethod(operationName = "eliminarTrabajador")
     public boolean eliminarTrabajador(@WebParam(name = "cedula") String cedula){
         if(cedula != null) {
             TrabajadorSalud tds =  trabajadorService.buscarPorCedula(cedula);
@@ -139,159 +141,60 @@ public class TrabajadorSoapService {
             throw new RuntimeException("El cedula no puede ser nula");
         }
     }
-    /**
-     * ==================================================================================
-     * MÉTODO 6: buscarPorEspecialidad
-     * ==================================================================================
-     * Busca trabajadores por especialidad
-     * 
-     * PASOS A SEGUIR:
-     * 
-     * 1. Agregar la anotación @WebMethod
-     *    @WebMethod(operationName = "buscarTrabajadoresPorEspecialidad")
-     * 
-     * 2. Definir el método que retorne List<TrabajadorDTO>
-     *    public List<TrabajadorDTO> buscarPorEspecialidad(...)
-     * 
-     * 3. Agregar el parámetro String especialidad con @WebParam
-     *    @WebParam(name = "especialidad") String especialidad
-     * 
-     * 4. Validar que la especialidad no sea null o vacía
-     *    if (especialidad == null || especialidad.isEmpty()) {
-     *        throw new RuntimeException("La especialidad no puede ser nula o vacía");
-     *    }
-     * 
-     * 5. Llamar al servicio de negocio para buscar por especialidad
-     *    List<TrabajadorSalud> trabajadores = trabajadorService.buscarPorEspecialidad(especialidad);
-     * 
-     * 6. Verificar si se encontraron trabajadores (opcional)
-     *    if (trabajadores == null || trabajadores.isEmpty()) {
-     *        // Puedes retornar lista vacía o lanzar excepción según el diseño
-     *        return new ArrayList<>();
-     *    }
-     * 
-     * 7. Convertir las entidades a DTOs
-     *    List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadores);
-     * 
-     * 8. Retornar la lista de DTOs
-     *    return trabajadoresDTOs;
-     * 
-     * 9. Envolver en try-catch para manejar excepciones
-     */
-    // TODO: Implementar buscarPorEspecialidad siguiendo los pasos anteriores
 
-    /**
-     * ==================================================================================
-     * MÉTODO 7: obtenerActivos
-     * ==================================================================================
-     * Obtiene solo los trabajadores activos
-     * 
-     * PASOS A SEGUIR:
-     * 
-     * 1. Agregar la anotación @WebMethod
-     *    @WebMethod(operationName = "obtenerTrabajadoresActivos")
-     * 
-     * 2. Definir el método que retorne List<TrabajadorDTO>
-     *    public List<TrabajadorDTO> obtenerActivos()
-     * 
-     * 3. Obtener todos los trabajadores desde el servicio de negocio
-     *    List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
-     * 
-     * 4. Filtrar solo los trabajadores activos usando streams
-     *    List<TrabajadorSalud> trabajadoresActivos = trabajadores.stream()
-     *        .filter(TrabajadorSalud::isActivo)
-     *        .toList();
-     * 
-     * 5. Verificar si hay trabajadores activos (opcional)
-     *    if (trabajadoresActivos.isEmpty()) {
-     *        return new ArrayList<>();
-     *    }
-     * 
-     * 6. Convertir las entidades a DTOs
-     *    List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadoresActivos);
-     * 
-     * 7. Retornar la lista de DTOs
-     *    return trabajadoresDTOs;
-     * 
-     * 8. Envolver en try-catch para manejar excepciones
-     */
-    // TODO: Implementar obtenerActivos siguiendo los pasos anteriores
+    @WebMethod(operationName = "buscarTrabajadoresPorEspecialidad")
+    public List<TrabajadorDTO> buscarPorEspecialidad(@WebParam(name="especialidad") String especialidad){
+        if(especialidad != null || !especialidad.isEmpty()) {
+            List<TrabajadorSalud> trabajadores = trabajadorService.buscarPorEspecialidad(especialidad);
+            if(trabajadores.stream().count() > 0){
+                List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadores);
+                return trabajadoresDTOs;
+            }else{
+                throw new RuntimeException("Trabajadores no encontrados con  especialidad: " + especialidad);
+            }
+        }else{
+            throw new RuntimeException("El especialidad no puede ser nula o vacia");
+        }
+    }
 
-    /**
-     * ==================================================================================
-     * MÉTODO 8: buscarConFiltros
-     * ==================================================================================
-     * Búsqueda con múltiples filtros opcionales
-     * 
-     * PASOS A SEGUIR:
-     * 
-     * 1. Agregar la anotación @WebMethod
-     *    @WebMethod(operationName = "buscarTrabajadoresConFiltros")
-     * 
-     * 2. Definir el método que retorne List<TrabajadorDTO>
-     *    public List<TrabajadorDTO> buscarConFiltros(...)
-     * 
-     * 3. Agregar múltiples parámetros opcionales con @WebParam:
-     *    @WebParam(name = "nombre") String nombre,
-     *    @WebParam(name = "apellido") String apellido,
-     *    @WebParam(name = "especialidad") String especialidad,
-     *    @WebParam(name = "activo") Boolean activo
-     * 
-     * 4. Obtener todos los trabajadores desde el servicio de negocio
-     *    List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
-     * 
-     * 5. Aplicar filtros usando streams (similar al método buscar de REST):
-     *    List<TrabajadorSalud> trabajadoresFiltrados = trabajadores.stream()
-     *        .filter(t -> (nombre == null || t.getNombre().equalsIgnoreCase(nombre)) &&
-     *                     (apellido == null || t.getApellido().equalsIgnoreCase(apellido)) &&
-     *                     (especialidad == null || t.getEspecialidad().equalsIgnoreCase(especialidad)) &&
-     *                     (activo == null || t.isActivo() == activo))
-     *        .toList();
-     * 
-     * 6. Convertir las entidades filtradas a DTOs
-     *    List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadoresFiltrados);
-     * 
-     * 7. Retornar la lista de DTOs (puede estar vacía)
-     *    return trabajadoresDTOs;
-     * 
-     * 8. Envolver en try-catch para manejar excepciones
-     */
-    // TODO: Implementar buscarConFiltros siguiendo los pasos anteriores
+    @WebMethod(operationName = "buscarTrabajadoresActivos")
+    public List<TrabajadorDTO> buscarTrabajadoresActivos(){
+        List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
+        if((long) trabajadores.size() > 0) {
+            trabajadores.stream()
+                    .filter(TrabajadorSalud::isActivo)
+                    .toList();
+            if (trabajadores.stream().count() > 0) {
+                List<TrabajadorDTO> trabajadoresDTOs = TrabajadorMapper.toDTOList(trabajadores);
+                return trabajadoresDTOs;
+            } else {
+                throw new RuntimeException("No se encontraron trabajadores activos");
+            }
+        }else{
+            throw new RuntimeException("No se encontraron trabajadores");
+        }
+    }
 
-    /**
-     * ==================================================================================
-     * NOTAS IMPORTANTES SOBRE SERVICIOS SOAP
-     * ==================================================================================
-     * 
-     * 1. DIFERENCIAS CON REST:
-     *    - No se usa ResponseWrapper, se retornan los datos directamente
-     *    - Los errores se manejan con excepciones que se convierten en SOAPFault
-     *    - No hay códigos de estado HTTP (200, 404, 500), todo es mediante excepciones
-     * 
-     * 2. ANOTACIONES PRINCIPALES:
-     *    - @WebService: Define la clase como servicio SOAP
-     *    - @WebMethod: Define un método como operación del servicio
-     *    - @WebParam: Define los parámetros de entrada con nombres explícitos
-     *    - @SOAPBinding: Define el estilo del servicio (DOCUMENT o RPC)
-     * 
-     * 3. TIPOS DE DATOS:
-     *    - Tipos simples (String, int, boolean, etc.) se mapean directamente
-     *    - Objetos complejos (DTOs) deben ser serializables a XML
-     *    - Las listas se convierten en arrays XML
-     * 
-     * 4. MANEJO DE ERRORES:
-     *    - Usar RuntimeException para errores generales
-     *    - O crear una clase personalizada anotada con @WebFault
-     *    - El servidor SOAP convertirá las excepciones en elementos <soap:Fault>
-     * 
-     * 5. PRUEBAS:
-     *    - Acceder al WSDL: http://localhost:8080/GestorIdentidades/TrabajadorSoapService?wsdl
-     *    - Usar herramientas como SoapUI o Postman para probar los servicios
-     *    - El WSDL describe todos los métodos disponibles y sus parámetros
-     * 
-     * 6. DEPLOYMENT:
-     *    - Los servicios SOAP se exponen automáticamente en el servidor de aplicaciones
-     *    - No necesitas configuración adicional como con REST (@ApplicationPath)
-     *    - La URL base es: http://<host>:<port>/<context-root>/<service-name>
-     */
+    @WebMethod(operationName = "buscarTrabajadoresPorFiltros")
+    public List<TrabajadorDTO> buscarTrabajadoresPorFiltros( @WebParam(name = "nombre") String nombre,
+                                                             @WebParam(name = "apellido") String apellido,
+                                                             @WebParam(name = "especialidad") String especialidad,
+                                                             @WebParam(name = "activo") Boolean activo){
+
+        List<TrabajadorSalud> trabajadores = trabajadorService.obtenerTodos();
+        if(trabajadores.stream().count() > 0){
+            List<TrabajadorSalud> trabajadoresFiltrados = trabajadores.stream()
+            .filter(t -> (nombre == null || t.getNombre().equalsIgnoreCase(nombre)) &&
+                         (apellido == null || t.getApellido().equalsIgnoreCase(apellido)) &&
+                         (especialidad == null || t.getEspecialidad().equalsIgnoreCase(especialidad)) &&
+                         (activo == null || t.isActivo() == activo))
+                    .toList();
+
+            List<TrabajadorDTO> dto = TrabajadorMapper.toDTOList(trabajadoresFiltrados);
+            return dto;
+        }else{
+            throw new RuntimeException("No se encontraron trabajadores");
+        }
+    }
+
 }
