@@ -1,33 +1,22 @@
-# Build stage
-FROM maven:3.8-openjdk-17 AS build
-WORKDIR /app
-COPY pom.xml .
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
+WORKDIR /build
+
+# Descarga las dependencias y compila la aplicación
+COPY pom.xml ./
+RUN mvn -B dependency:go-offline
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN set -eux; \
+    mvn -B clean package; \
+    if [ -f target/PrestadorSalud.war ]; then \
+        :; \
+    else \
+        WAR_PATH="$(find target -maxdepth 1 -type f -name '*.war' | head -n 1)"; \
+        if [ -z "$WAR_PATH" ]; then echo ".war no encontrado" >&2; exit 1; fi; \
+        mv "$WAR_PATH" target/PrestadorSalud.war; \
+    fi
 
-# Runtime stage - Using WildFly
-FROM quay.io/wildfly/wildfly:31.0.0.Final-jdk17
+FROM quay.io/wildfly/wildfly:latest
 
-# Switch to root user for setup
-USER root
+COPY --from=builder /build/target/PrestadorSalud.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
 
-# Copy the WAR file to WildFly deployments directory
-COPY --from=build /app/target/*.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
-
-# Create a script to configure WildFly for Railway's dynamic port
-RUN echo '#!/bin/bash' > /opt/jboss/wildfly/bin/configure-port.sh && \
-    echo 'if [ -n "$PORT" ]; then' >> /opt/jboss/wildfly/bin/configure-port.sh && \
-    echo '  /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=$PORT' >> /opt/jboss/wildfly/bin/configure-port.sh && \
-    echo 'else' >> /opt/jboss/wildfly/bin/configure-port.sh && \
-    echo '  /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0' >> /opt/jboss/wildfly/bin/configure-port.sh && \
-    echo 'fi' >> /opt/jboss/wildfly/bin/configure-port.sh && \
-    chmod +x /opt/jboss/wildfly/bin/configure-port.sh
-
-# Switch back to jboss user
-USER jboss
-
-# Expose the port
-EXPOSE 8080
-
-# Run WildFly with the configured port
-CMD ["/opt/jboss/wildfly/bin/configure-port.sh"]
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]

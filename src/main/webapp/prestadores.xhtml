@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+<h:head>
+    <title>Prestadores de Salud</title>
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            background-color: #f2f4f7;
+            color: #1f2933;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+            font-size: 2.25rem;
+        }
+
+        .descripcion {
+            margin: 0 0 2rem;
+            color: #52606d;
+        }
+
+        .mensajes {
+            margin-bottom: 1.5rem;
+        }
+
+        .mensajes ul {
+            margin: 0;
+            padding: 0.75rem 1rem;
+            list-style: none;
+            border-radius: 0.5rem;
+            background-color: #eef2ff;
+            color: #4338ca;
+        }
+
+        .mensajes ul li {
+            margin: 0.25rem 0;
+        }
+
+        .acciones {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+            padding: 1.75rem;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .form-grid {
+            width: 100%;
+            border-spacing: 0.75rem 0.6rem;
+        }
+
+        .form-grid label {
+            font-weight: 600;
+            color: #364152;
+        }
+
+        .form-grid input,
+        .form-grid select {
+            width: 100%;
+            padding: 0.55rem 0.65rem;
+            border: 1px solid #cbd2d9;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: #f8fafc;
+        }
+
+        .form-grid input:focus,
+        .form-grid select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .botones {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .botones .primario,
+        .botones .secundario {
+            padding: 0.65rem 1.4rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .botones .primario {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+
+        .botones .primario:hover {
+            background-color: #4338ca;
+        }
+
+        .botones .secundario {
+            background-color: #e4e7eb;
+            color: #364152;
+        }
+
+        .botones .secundario:hover {
+            background-color: #d2d6dc;
+        }
+
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .tabla thead {
+            background-color: #eef2ff;
+            color: #3730a3;
+        }
+
+        .tabla th,
+        .tabla td {
+            padding: 0.75rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tabla tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .tabla tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .tabla tbody tr:nth-child(even):hover {
+            background-color: #f1f5f9;
+        }
+
+        .tabla-vacia {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd2d9;
+            color: #52606d;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .botones {
+                flex-direction: column;
+            }
+
+            .botones .primario,
+            .botones .secundario {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</h:head>
+<h:body>
+<main>
+    <h1>Prestadores de Salud</h1>
+
+    <h:panelGroup id="mensajes" styleClass="mensajes">
+        <h:messages globalOnly="true" layout="unorderedList" showDetail="true"/>
+    </h:panelGroup>
+
+    <section class="acciones">
+        <h:form id="formAgregar" styleClass="card">
+            <h2>Registrar prestador</h2>
+            <h:panelGrid columns="2" styleClass="form-grid">
+                <h:outputLabel for="nombre" value="Nombre"/>
+                <h:inputText id="nombre" value="#{prestadorSaludBean.nuevoPrestador.nombre}" label="Nombre" required="true"
+                             requiredMessage="El nombre es obligatorio"/>
+
+                <h:outputLabel for="direccion" value="Dirección"/>
+                <h:inputText id="direccion" value="#{prestadorSaludBean.nuevoPrestador.direccion}" label="Dirección" required="true"
+                             requiredMessage="La dirección es obligatoria"/>
+
+                <h:outputLabel for="tipo" value="Tipo"/>
+                <h:selectOneMenu id="tipo" value="#{prestadorSaludBean.nuevoPrestador.tipo}" label="Tipo" required="true"
+                                 requiredMessage="Seleccione el tipo de prestador">
+                    <f:selectItem itemLabel="Seleccione" itemValue="" noSelectionOption="true"/>
+                    <f:selectItems value="#{prestadorSaludBean.tiposPrestador}"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+            <div class="botones">
+                <h:commandButton id="btnAgregar" value="Agregar" styleClass="primario">
+                    <f:ajax execute="@form" render="mensajes formAgregar formBuscar listaPrestadores"
+                            listener="#{prestadorSaludBean.agregar}"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <h:form id="formBuscar" styleClass="card">
+            <h2>Buscar prestadores</h2>
+            <h:panelGrid columns="2" styleClass="form-grid">
+                <h:outputLabel for="filtro" value="Nombre"/>
+                <h:inputText id="filtro" value="#{prestadorSaludBean.filtroNombre}" label="Nombre">
+                    <f:ajax event="keyup" delay="400" render="listaPrestadores"
+                            listener="#{prestadorSaludBean.buscar}"/>
+                </h:inputText>
+            </h:panelGrid>
+            <div class="botones">
+                <h:commandButton id="btnBuscar" value="Buscar" styleClass="primario">
+                    <f:ajax execute="@form" render="listaPrestadores"
+                            listener="#{prestadorSaludBean.buscar}"/>
+                </h:commandButton>
+                <h:commandButton id="btnLimpiar" value="Limpiar" styleClass="secundario" immediate="true">
+                    <f:ajax execute="@this" render="formBuscar listaPrestadores"
+                            listener="#{prestadorSaludBean.limpiarBusqueda}"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+    </section>
+
+    <section id="listaPrestadores" class="card">
+        <h2>Listado de prestadores</h2>
+        <h:panelGroup rendered="#{empty prestadorSaludBean.prestadores}" styleClass="tabla-vacia">
+            <h:outputText value="Aún no hay prestadores registrados."/>
+        </h:panelGroup>
+        <h:dataTable value="#{prestadorSaludBean.prestadores}" var="p" rendered="#{not empty prestadorSaludBean.prestadores}" styleClass="tabla">
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                <h:outputText value="#{p.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Nombre</f:facet>
+                <h:outputText value="#{p.nombre}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Dirección</f:facet>
+                <h:outputText value="#{p.direccion}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Tipo</f:facet>
+                <h:outputText value="#{p.tipo}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Registrado</f:facet>
+                <h:outputText value="#{prestadorSaludBean.formatearRegistro(p.regDate)}"/>
+            </h:column>
+        </h:dataTable>
+    </section>
+</main>
+</h:body>
+</html>

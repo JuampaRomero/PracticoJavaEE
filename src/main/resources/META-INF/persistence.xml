@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
-             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
-             version="3.0">
-
-    <!-- Unidad de persistencia para el Gestor de Identidades -->
-    <persistence-unit name="GestorIdentidadesPU" transaction-type="JTA">
-        
-        <!-- Proveedor de JPA (Hibernate en WildFly) -->
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        
-        <!-- DataSource JNDI configurado en WildFly -->
-        <jta-data-source>java:jboss/datasources/GestorIdentidadesDS</jta-data-source>
-        
-        <!-- Entidades JPA -->
-        <class>com.ejercicio1.entities.TrabajadorSalud</class>
-        
-        <!-- Propiedades de Hibernate -->
+             version="3.0"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name="PrestadorPU" transaction-type="JTA">
+        <jta-data-source>java:/jdbc/PrestadorDS</jta-data-source>
+        <class>PrestadorSalud.model.PrestadorSalud</class>
         <properties>
-            <!-- Dialecto de PostgreSQL -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
-            
-            <!-- Estrategia de generación de esquema -->
-            <!-- update: actualiza el esquema sin perder datos -->
-            <!-- create: crea el esquema desde cero (borra datos existentes) -->
-            <!-- create-drop: crea al inicio y elimina al finalizar -->
-            <!-- validate: solo valida el esquema -->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-            
-            <!-- Mostrar SQL en consola (útil para desarrollo) -->
-            <property name="hibernate.show_sql" value="true"/>
-            
-            <!-- Formatear SQL para mejor legibilidad -->
-            <property name="hibernate.format_sql" value="true"/>
-            
-            <!-- Comentarios SQL -->
-            <property name="hibernate.use_sql_comments" value="true"/>
-            
-            <!-- Estadísticas de Hibernate (para debugging) -->
-            <property name="hibernate.generate_statistics" value="false"/>
         </properties>
     </persistence-unit>
-
+    <persistence-unit name="PrestadorLocalPU" transaction-type="RESOURCE_LOCAL">
+        <class>PrestadorSalud.model.PrestadorSalud</class>
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/prestador_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password" value="postgres"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+        </properties>
+    </persistence-unit>
 </persistence>
